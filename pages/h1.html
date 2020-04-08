@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <title>Palvelinten hallinta</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../css/index.css">
+</head>
+<body>
+    <header>
+        <a class="headlink" href="../index.html">
+            <h2>Palvelinten hallinta<br>Harjoitus 1</h2>
+            <p>Kristian Koponen</p>
+        </a>
+    </header>
+    <div class="navBar">
+        <ul>
+            <li><a href="h1.html" class="active"><b>Harjoitus 1</b><br>aa</a></li>
+            <li><a href="h2.html"><b>Harjoitus 2</b><br>-</a></li>
+            <li><a href="h3.html"><b>Harjoitus 3</b><br>-</a></li>
+            <li><a href="h4.html"><b>Harjoitus 4</b><br>-</a></li>
+            <li><a href="h5.html"><b>Harjoitus 5</b><br>-</a></li>
+            <li><a href="h6.html"><b>Harjoitus 6</b><br>-</a></li>
+            <li><a href="h7.html"><b>Harjoitus 7</b><br>-</a></li>
+            <li><a href="h8.html"><b>Harjoitus 8</b><br>-</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        <h2>Hello Salt!</h2>
+        <span>07.04.2020, Kristian Koponen<br></span>
+        <div class="blueBox">
+            <h3>Tehtävänanto<br><span class="small"><a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020#h1-hei-maailma-verkon-yli-ja-idempotenssi">Palvelinten hallinta H1</a></span></h3>
+			<ul>
+                <li><a href="h1.html#h1a">VirtualBox</a></li>
+                <li><a href="h1.html#h1b">Asenna Salt</a></li>
+                <li><a href="h1.html#h1c">Hei, maailma. (.sls)</a></li>
+                <li><a href="h1.html#h1d">Tietoa koneesta</a></li>
+                <li><a href="h1.html#h1e">Muu tila</a></li>
+            </ul>
+        </div>
+        <div class="blueBox">
+            <h3>Käytetyt laitteet</h3>
+            <p class="bold">Windows 10</p>
+            <table>
+                <tr>
+                    <th>Prosessori:</th>
+                    <th>Intel(R) Core(TM) i5-2500K @ 3.30Ghz</th>
+                </tr>
+                <tr>
+                    <th>Keskusmuisti:</th>
+                    <th>8GiB DDR3</th>
+                </tr>
+                <tr>
+                    <th>Näytönohjain:</th>
+                    <th>Nvidia GTX 970</th>
+                </tr>
+                <tr>
+                    <th>Käyttöjärjestelmä:</th>
+                    <th>Windows 10 64-bit</th>
+                </tr>
+            </table>
+            <p class="bold">VirtualBox 6.1</p>
+            <p>xubuntu 18.04.4 amd64 ISO</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h1a">VirtualBox</h3>
+            <h4>VirtualBox</h4>
+            <p>Tehtävää ja kurssia varten aion käyttää virtuaalikonetta VirtualBoxin avulla.</p>
+            <p>Aloitetaan luomalla uusi virtuaalikone VirtualBox 6.1:ssä. Käytän virtuaalikoneen luomiseen Tero Karvisen <a href="http://terokarvinen.com/2020/remote-learning-tools-for-my-courses/#create-a-new-virtual-machine">remote learning tools</a> -ohjeissa määriteltyjä asetuksia.</p>
+            <a href="../img/h1/h1img1.jpg"><img src="../img/h1/h1img1.jpg" alt="h1img1"></a>
+            <p>Avataan luodun koneen asetukset ja laitetaan <a href="https://xubuntu.org/download#lts">viimeisin xubuntu LTS version (18.04.4)</a> -levykuva virtuaalikoneeseen.</p>
+            <a href="../img/h1/h1img2.jpg"><img src="../img/h1/h1img2.jpg" alt="h1img2"></a>
+            <h4>Xubuntun asennus</h4>
+            <p>Käynnistetään kone. Koneen käynnistyttyä valitaan "Try Xubuntu". Työpöydälle päästyä voidaan asentaa Xubuntu koneelle klikkaamalla työpöydällä "Install Xubuntu 18.04.4 LTS". Käytetään seuraavia asetuksia.</p>
+            <ul>
+                <li>Welcome<br>
+                    <ul>
+                        <li>English</li>
+                    </ul>
+                </li>
+                <li>Keyboard layout<br>
+                    <ul>
+                        <li>Finnish</li>
+                    </ul>
+                </li>
+                <li>Updates and other software<br>
+                    <ul>
+                        <li>✓ Download updates while installing Xubuntu</li>
+                        <li>✓ Install third-party software for graphics and Wi-Fi hardware and additional media formats</li>
+                    </ul>
+                </li>
+                <li>Installation type<br>
+                    <ul>
+                        <li>Erase disk and install Xubuntu</li>
+                    </ul>
+                </li>
+                <li>Where are you?<br>
+                    <ul>
+                        <li>Helsinki</li>
+                    </ul>
+                </li>
+                <li>Who are you?</li>
+            </ul>
+            <p>Käyttöjärjestelmällä menee tovi asentua. Käynnistetään tämän jälkeen virtuaalikone uudestaan.</p>
+            <h3>VirtualBox Guest Additions</h3>
+            <p>Jotta VirtualBoxin käyttö olisi mukavampaa, eli ikkunan koko on responsiivinen ja tiedon siirto isäntäkoneen ja virtuaalikoneen välillä on helpompaa, on käytettävä Guest Additionsia. Valitaan VirtualBoxin ylävalikosta "Devices" ja Guest Additions CD image</p>
+            <p>Avataan terminaali ja asennetaan tarvittavat lisäosat.</p>
+<pre class="code"><code>$ sudo apt-get update
+$ sudo apt-get -y install linux-headers-$(uname -r) build-essential dkms virtualbox-guest-dkms
+...
+$ cd /media/krisu/VBox_GAs_6.1.4/
+$ sudo ./VBoxLinuxAdditions.run</code></pre>
+            <p>Käynnistetään jälleen virtuaalikone uudelleen. Nyt ikkunan kokoa voi muokata, mutta yhteistä leikepöytää ei löydy. Klikataan "Devices" ja "Shared clipboard". Asetetaan se kaksisuuntaiseksi, eli "Bidirectional". Sama tehdään kohdassa "Drag and Drop".</p>
+            <p>Copy-paste ei vieläkään toimi. Vietän aikaa hakukoneen parissa.</p>
+            <p>Löysin <a href="https://forums.virtualbox.org/viewtopic.php?f=6&t=97052">keskustelulangan</a> VirtualBoxin foorumeilta. Täältä ilmenee, että VBox Guest Additions 6.1.4 päivitys on rikkonut copy-paste toiminnon.</p>
+            <p>Kyseisestä langasta löytyy myös nopeat ohjeet vanhemman version asentamiseen.</p>
+<pre class="code"><code>$ sudo apt-get remove -y virtualbox-guest-x11
+$ sudo apt-get remove -y virtualbox-guest-dkms
+$ sudo apt-get remove -y virtualbox-guest-utils
+$ reboot
+$ wget https://download.virtualbox.org/virtualbox/6.1.2/VBoxGuestAdditions_6.1.2.iso
+$ sudo mkdir /media/iso
+$ sudo mount VBoxGuestAdditions_6.1.2.iso /media/iso -o loop
+$ sudo /media/iso/VBoxLinuxAdditions.run
+$ reboot</code></pre>
+            <p>Tämän tehtyä copy-paste toimii isäntäkoneen ja vieraskoneen välillä.</p>
+        </div>
+            
+        <div class="blueBox">
+            <h3 id="h1b">Asenna Salt</h3>
+            <p class="assignment">Asenna Salt ja siihen uusi orja. Voit tehdä ne esimerkiksi uudelle virtuaalikoneelle, niin pääset kokeilemaan puhtaalta pöydältä.</p>
+            <p>Salt on python-pohjainen työkalu, jolla voidaan kontrolloida useita tietokoneita kerralla master/slave -periaatteella, jossa master-kone käskyttää slave-koneita.</p>
+            <p>Seuraavassa vaiheessa käytän apuna Tero Karvisen <a href="http://terokarvinen.com/2018/salt-quickstart-salt-stack-master-and-slave-on-ubuntu-linux">Salt Quickstart</a> -ohjeita.</p>
+            <h4>Asennus</h4>
+            <p>Päivitetään paketinhallinta ja asennetaan Saltin master-paketti.</p>
+<pre class="code"><code>$ sudo apt-get update
+$ sudo apt-get install salt-master -y</code></pre>
+            <p>Ei välttämätöntä, mutta harjoituksen vuoksi käynnistetään palomuuri ja tehdään Saltin käyttämille porteille tarvittavat reiät.</p>
+<pre class="code"><code>$ sudo ufw allow 4505/tcp
+$ sudo ufw allow 4506/tcp
+$ sudo ufw enable</code></pre>
+            <p>Asennetaan myös slave-paketti (aka 'minion').</p>
+<pre class="code"><code>$ sudo apt-get install salt-minion -y</code></pre>
+            <p>Katsotaan valmiiksi koneen sisäinen IP-osoite ja käydään muokkaamassa minion-tiedostoa.</p>
+<pre class="code"><code>$ hostname -I
+10.0.2.15
+$ sudoedit /etc/salt/minion</code></pre>
+            <p>Tarvittava tieto on masterin sijainti. Slave käyttää oletuksena koneen hostnamea id:nä, mutta jokaisella slave-koneella on oltava yksilöllinen nimi, joten se on myös hyvä määritellä. Lisätään tiedoston alkuun.</p>
+            <div class="taskerror">
+                <b>Virhe</b>
+<pre class="code"><code>master: 10.0.0.15
+id: wings</code></pre>
+                <p>Tallennetaan ja käynnistetään minion uudelleen.</p>
+<pre class="code"><code>$ sudo systemctl restart salt-minon.service</code></pre>
+                <p>Nyt masterin on hyväksyttävä slave-avain.</p>
+<pre class="code"><code>$ sudo salt-key -A
+The key glob '*' does not match any unaccepted keys.</code></pre>
+                <p>Tuli virhe. Tarkastellaan lokista mitä kävi.</p>
+<pre class="code"><code>$ tail -20 /var/log/syslog
+...
+Apr  8 00:18:07 wings salt-minion[7324]: [ERROR   ] Error while bringing up minion for multi-master. Is master at 10.0.0.15 responding?
+...</code></pre>
+                <p>Tästä huomaan, että hostname on kirjoitettu väärin.</p>
+<pre class="code"><code></code>$ sudoedit /etc/salt/minion</pre>
+            </div>
+<pre class="code"><code>master: 10.0.<span style="color:yellow">2</span>.15
+id: wings</code></pre>
+            <p>Eli siis, nyt masterin on hyväksyttävä slave-avain.</p>
+<pre class="code"><code>$ sudo systemctl restart salt-minion.service
+$ sudo salt-key -A
+The following keys are going to be accepted:
+<span style="color:pink">Unaccepted Keys:</span>
+<span style="color:red">wings</span>
+Proceed? [n/Y] Y
+Key for minion wings accepted.</code></pre>
+            <h4>Kokeilu</h4>
+            <p>Testataan tässä vaiheessa eri komennoilla.</p>
+<pre class="code"><code>$ sudo salt '*' cmd.run 'whoami'
+wings:
+    root
+$ sudo salt '*' cmd.run 'hostname -I'
+wings:
+    10.0.2.15
+$ sudo salt '*' pkg.install tree
+wings:
+    ----------
+    tree:
+        ----------
+        new:
+            1.7.0-5
+        old:
+$ tree
+.
+├── Desktop
+├── Documents
+├── Downloads
+├── Music
+├── Pictures
+├── Public
+├── Templates
+├── VBoxGuestAdditions_6.1.2.iso
+└── Videos
+
+8 directories, 1 file</code></pre>
+            <p>Päätellään että Salt toimii.</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h1c">Hei, maailma. (.sls)</h3>
+            <p class="assignment">Tee saltille idempotenssi hei maailma (siis tiedostosta, foo.sls)</p>
+            <p>Edellisessä harjoituksessa annettiin yksittäisiä komentoja slave-koneille kerrallaan, mutta Salt mahdollistaa myös useiden tekstitiedostoon tallennettujen toimintojen toteuttamisen.</p>
+            <p>Käytän tämän harjoituksen apuna Tero Karvisen <a href="http://terokarvinen.com/2018/salt-states-i-want-my-computers-like-this">Salt states</a> -ohjeita.</p>
+            <h4>Tilan luonti</h4>
+            <p>Saltin master-konfiguraatiossa <span class="command">/srv/salt/master</span> määritelty palvelin kansio on <span class="command">/srv/salt/</span>. Luodaan ja siirrytään kyseiseen kansioon.</p>
+<pre class="code"><code>$ sudo mkdir -p /srv/salt/
+$ cd /srv/salt/</code></pre>
+            <p>Luodaan tila-tiedosto (state).</p>
+<pre class="code"><code>$ sudoedit /srv/salt/hello.sls</code></pre>
+<pre class="code"><code>/tmp/hellosalt.txt:
+  file.managed:
+    - source: salt://hellosalt.txt</code></pre>
+            <p>"salt://" siis viittaa äsken luotuun <span class="command">/srv/salt/</span> -kansioon, joten luodaan hellosalt -tekstitiedosto samaan kansioon.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/hellosalt.txt</code></pre>
+<pre class="code"><code>Hello Salt! t: master</code></pre>
+            <h4>Tilan levitys</h4>
+            <p>Tila voidaan levittää komennolla</p>
+<pre class="code"><code>$ sudo salt '*' state.apply hello</code></pre>
+            <p>Jossa '*' on kohde, johon se levitetään id:n perusteella. Tähti (*) merkitsee kaikkia koneita. Tehdään tämä ja testataan.</p>
+<pre class="code"><code>$ sudo salt '*' state.apply hello
+wings:
+----------
+          ID: /tmp/hellosalt.txt
+    Function: file.managed
+      Result: True
+     Comment: File /tmp/hellosalt.txt updated
+     Started: 01:26:32.242463
+    Duration: 36.376 ms
+     Changes:   
+              ----------
+              diff:
+                  New file
+              mode:
+                  0644
+
+Summary for wings
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  36.376 ms</code></pre>
+<pre class="code"><code>$ cat /tmp/hellosalt.txt 
+Hello Salt! t: master</code></pre>
+            <p>Vaihtoehtoinen ja parempi tapa on luoda top.sls -tiedosto, joka levittää valitut tilat kaikkiin tai yksittäisiin slave-koneisiin automaattisesti. Muokataan hellosalt -tekstitiedostoa.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/hellosalt.txt</code></pre>
+<pre class="code"><code>Hello again, Salt! t: master</code></pre>
+            <p>Kokeillaan.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/top.sls</code></pre>
+<pre class="code"><code>base:
+  '*':
+    - hello</code></pre>
+            <p>top.sls -tiedosto levittäytyy siis automaattisesti, mutta odotuksen säästämiseksi se voidaan levittää samantien komenolla</p>
+<pre class="code"><code>$ sudo salt '*' state.highstate
+wings:
+----------
+          ID: /tmp/hellosalt.txt
+    Function: file.managed
+      Result: True
+     Comment: File /tmp/hellosalt.txt updated
+     Started: 01:43:40.789253
+    Duration: 67.446 ms
+     Changes:   
+              ----------
+              diff:
+                  --- 
+                  +++ 
+                  @@ -1 +1 @@
+                  -Hello Salt! t: master
+                  +Hello again, Salt! t: master
+
+Summary for wings
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  67.446 ms</code></pre>
+<pre class="code"><code>$ cat /tmp/hellosalt.txt
+Hello again, Salt! t: master
+</code></pre>
+            <h4>Lopputulos</h4>
+            <p>Tilan levittäminen onnistui kummallakin tavalla. Päätellään että toimii.</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h1d">Tietoa koneesta.</h3>
+            <p class="assignment">Kerää tietoa koneesta saltin avulla (grains.items)</p>
+            <p>"Grains" on rajapinta (interface), jolla voidaan hakea tietoa käyttöjärjestelmästä, domainista, IP-osoitteesta, kernelistä, muistista ja monesta muusta järjestelmätiedosta.</p>
+            <p>Haetaan tietoa esim. prosessorista, käyttöjärjestelmästä ja kernelistä.</p>
+<pre class="code"><code>$ sudo salt '*' grains.items|grep -A 3 cpu_model;sudo salt '*' grains.items|grep -A 3 'os:';sudo salt '*' grains.items|grep -A 1 kernel
+    cpu_model:
+        Intel(R) Core(TM) i5-2500K CPU @ 3.30GHz
+    cpuarch:
+        x86_64
+    os:
+        Ubuntu
+    os_family:
+        Debian
+    kernel:
+        Linux
+    kernelrelease:
+        5.3.0-46-generic
+</code></pre>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h1e">Muu tila</h3>
+            <p class="assignment">Kokeile jotain toista tilaa kuin file.managed. Tärkeitä ovat pkg.installed, file.managed, service.running, file.symlink, user.present, group.present. Ohjeita saa esim 'sudo salt kissa sys.state_doc pkg.installed|less'</p>
+            <p>Muokataan top -tiedostoa.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/top.sls</code></pre>
+<pre class="code"><code>base:
+  '*':
+    - hello
+  'wings':
+    - installs</code></pre>
+            <p>Luodaan uusi tiedosto pakettien asennuksille.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/installs.sls</code></pre>
+<pre class="code"><code>htop:
+  pkg.installed
+
+vlc:
+  pkg.installed</code></pre>
+            <p>Ajetaan tila ulos.</p>
+<pre class="code"><code>$ sudo salt '*' state.highstate
+wings:
+----------
+          ID: /tmp/hellosalt.txt
+    Function: file.managed
+      Result: True
+     Comment: File /tmp/hellosalt.txt is in the correct state
+     Started: 02:55:32.225202
+    Duration: 56.521 ms
+     Changes:   
+----------
+          ID: htop
+    Function: pkg.installed
+      Result: True
+     Comment: The following packages were installed/updated: htop
+     Started: 02:55:36.945838
+    Duration: 26185.008 ms
+     Changes:   
+              ----------
+              htop:
+                  ----------
+                  new:
+                      2.1.0-3
+                  old:
+----------
+          ID: vlc
+    Function: pkg.installed
+      Result: True
+     Comment: The following packages were installed/updated: vlc
+     Started: 02:56:03.142783
+    Duration: 29011.886 ms
+     Changes:
+              
+<span style="color:khaki"># ...
+# (VLC:n asennuksesta huomattavan paljon tulostetta pluginien ja koodekkien vuoksi)
+# ...</span>
+
+Summary for wings
+------------
+Succeeded: 3 (changed=2)
+Failed:    0
+------------
+Total states run:     3
+Total run time:  55.253 s
+</code></pre>
+            <p>Koneella näkyy asennettuna htop ja VLC.</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3>Lähteet</h3>
+            <p>
+                <a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/">http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/</a><br>
+                <a href="http://terokarvinen.com/2020/remote-learning-tools-for-my-courses/">http://terokarvinen.com/2020/remote-learning-tools-for-my-courses/</a><br>
+                <a href="http://terokarvinen.com/2018/salt-quickstart-salt-stack-master-and-slave-on-ubuntu-linux">http://terokarvinen.com/2018/salt-quickstart-salt-stack-master-and-slave-on-ubuntu-linux</a><br>
+                <a href="https://docs.saltstack.com/en/latest/ref/states/all/salt.states.pkg.html">https://docs.saltstack.com/en/latest/ref/states/all/salt.states.pkg.html</a><br>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
