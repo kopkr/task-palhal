@@ -15,7 +15,7 @@
     <div class="navBar">
         <ul>
             <li><a href="h1.html" class="active"><b>Harjoitus 1</b><br>Hello Salt!</a></li>
-            <li><a href="h2.html"><b>Harjoitus 2</b><br>-</a></li>
+            <li><a href="h2.html"><b>Harjoitus 2</b><br>Package-File-Service</a></li>
             <li><a href="h3.html"><b>Harjoitus 3</b><br>-</a></li>
             <li><a href="h4.html"><b>Harjoitus 4</b><br>-</a></li>
             <li><a href="h5.html"><b>Harjoitus 5</b><br>-</a></li>
@@ -67,9 +67,9 @@
             <h4>VirtualBox</h4>
             <p>Tehtävää ja kurssia varten aion käyttää virtuaalikonetta VirtualBoxin avulla.</p>
             <p>Aloitetaan luomalla uusi virtuaalikone VirtualBox 6.1:ssä. Käytän virtuaalikoneen luomiseen Tero Karvisen <a href="http://terokarvinen.com/2020/remote-learning-tools-for-my-courses/#create-a-new-virtual-machine">remote learning tools</a> -ohjeissa määriteltyjä asetuksia.</p>
-            <a href="../img/h1/h1img1.jpg"><img src="../img/h1/h1img1.jpg" alt="h1img1"></a>
+            <a href="../img/h1/h1img1.jpg" target="_blank"><img src="../img/h1/h1img1.jpg" alt="h1img1"></a>
             <p>Avataan luodun koneen asetukset ja laitetaan <a href="https://xubuntu.org/download#lts">viimeisin xubuntu LTS version (18.04.4)</a> -levykuva virtuaalikoneeseen.</p>
-            <a href="../img/h1/h1img2.jpg"><img src="../img/h1/h1img2.jpg" alt="h1img2"></a>
+            <a href="../img/h1/h1img2.jpg" target="_blank"><img src="../img/h1/h1img2.jpg" alt="h1img2"></a>
             <h4>Xubuntun asennus</h4>
             <p>Käynnistetään kone. Koneen käynnistyttyä valitaan "Try Xubuntu". Työpöydälle päästyä voidaan asentaa Xubuntu koneelle klikkaamalla työpöydällä "Install Xubuntu 18.04.4 LTS". Käytetään seuraavia asetuksia.</p>
             <ul>
@@ -103,6 +103,7 @@
             </ul>
             <p>Käyttöjärjestelmällä menee tovi asentua. Käynnistetään tämän jälkeen virtuaalikone uudestaan.</p>
             <h3>VirtualBox Guest Additions</h3>
+            
             <p>Jotta VirtualBoxin käyttö olisi mukavampaa, eli ikkunan koko on responsiivinen ja tiedon siirto isäntäkoneen ja virtuaalikoneen välillä on helpompaa, on käytettävä Guest Additionsia. Valitaan VirtualBoxin ylävalikosta "Devices" ja Guest Additions CD image</p>
             <p>Avataan terminaali ja asennetaan tarvittavat lisäosat.</p>
 <pre class="code"><code>$ sudo apt-get update
@@ -112,7 +113,7 @@ $ cd /media/krisu/VBox_GAs_6.1.4/
 $ sudo ./VBoxLinuxAdditions.run</code></pre>
             <p>Käynnistetään jälleen virtuaalikone uudelleen. Nyt ikkunan kokoa voi muokata, mutta yhteistä leikepöytää ei löydy. Klikataan "Devices" ja "Shared clipboard". Asetetaan se kaksisuuntaiseksi, eli "Bidirectional". Sama tehdään kohdassa "Drag and Drop".</p>
             <p>Copy-paste ei vieläkään toimi. Vietän aikaa hakukoneen parissa.</p>
-            <p>Löysin <a href="https://forums.virtualbox.org/viewtopic.php?f=6&t=97052">keskustelulangan</a> VirtualBoxin foorumeilta. Täältä ilmenee, että VBox Guest Additions 6.1.4 päivitys on rikkonut copy-paste toiminnon.</p>
+            <div class="taskerror"><b>Huom!</b><p>Löysin <a href="https://forums.virtualbox.org/viewtopic.php?f=6&t=97052">keskustelulangan</a> VirtualBoxin foorumeilta. Täältä ilmenee, että VBox Guest Additions 6.1.4 päivitys on rikkonut copy-paste toiminnon.</p>
             <p>Kyseisestä langasta löytyy myös nopeat ohjeet vanhemman version asentamiseen.</p>
 <pre class="code"><code>$ sudo apt-get remove -y virtualbox-guest-x11
 $ sudo apt-get remove -y virtualbox-guest-dkms
@@ -123,7 +124,7 @@ $ sudo mkdir /media/iso
 $ sudo mount VBoxGuestAdditions_6.1.2.iso /media/iso -o loop
 $ sudo /media/iso/VBoxLinuxAdditions.run
 $ reboot</code></pre>
-            <p>Tämän tehtyä copy-paste toimii isäntäkoneen ja vieraskoneen välillä.</p>
+            <p>Tämän tehtyä copy-paste toimii isäntäkoneen ja vieraskoneen välillä.</p></div>
         </div>
             
         <div class="blueBox">
@@ -377,12 +378,12 @@ Total states run:     3
 Total run time:  55.253 s
 </code></pre>
             <p>Koneella toimii htop ja VLC.</p>
-            <a href="../img/h1/h1img3.jpg"><img src="../img/h1/h1img3.jpg" alt="h1img3"></a><br>
+            <a href="../img/h1/h1img3.jpg" target="_blank"><img src="../img/h1/h1img3.jpg" alt="h1img3"></a><br>
             <span style="font-size:12px;">(Lisätty puuttuva kuva 09.04.2020)</span>
         </div>
         
         <div class="blueBox">
-            <h3>Lähteet</h3>
+            <h3>Lähteet ja materiaalit</h3>
             <p>
                 <a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/">http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/</a><br>
                 <a href="http://terokarvinen.com/2020/remote-learning-tools-for-my-courses/">http://terokarvinen.com/2020/remote-learning-tools-for-my-courses/</a><br>
