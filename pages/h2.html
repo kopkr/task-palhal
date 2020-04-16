@@ -228,7 +228,9 @@ Hello, VirtualHost</code></pre>
 <pre class="code"><code>$ sudo mv /home/krisu/tesmitys.example.com /var/www
 $ sudo systemctl restart apache2
 $ curl localhost
-Hello, VirtualHost</code></pre></div>
+Hello, VirtualHost</code></pre><br>
+                <div class="quote"><b>Huom!</b>
+            <p><span class="command">/var/www/</span> ei ole oletuksena hyvä paikka säilöä webbisivuja. <i>(Lisätty 16.04.2020)</i></p></div></div>
             
             <hr>
             <h3 id="h2a4">Apachen konfiguraatio (SaltStackilla)</h3>
@@ -402,6 +404,17 @@ $ sudo mkdir tesmitysdir
 $ sudoedit tesmitysdir/init.sls
 </code></pre>
             <p>Kansion luonnissa hyödynnetään omistajan ja ryhmän asettamista sekä myös rekursiivisesti sen sisällön oikeudet funktiolla <span class="command">recurse</span>. Mode vaikuttaa kansion lupiin. Ensimmäinen numero 7, tarkoittaa omistajan oikeutta lukea, kirjoittaa ja suorittaa. Toinen numero, myös 7, tarkoittaa ryhmän oikeuksia, samat oikeudet. Ja kolmas numero 5, tarkoittaa muiden oikeutta lukea ja suorittaa, mutta ei kirjoittaa. <a href="https://www.computerhope.com/unix/uchmod.htm">Linux chmod command</a><br>makedirs -funktio luo yläkansiot mikäli niitä ei ole.</p>
+            <div class="taskerror">
+                <i>Lisäys 16.04.2020</i>
+                <p>Oikeuksista vielä lisää.</p>
+                <ul>
+                    <li>4 tarkoittaa lukuoikeusia (r)</li>
+                    <li>2 tarkoittaa kirjoitusoikeuksia (w)</li>
+                    <li>1 tarkoittaa suoritusoikeuksia (x)</li>
+                    <li>0 tarkoittaa ei oikeuksia</li>
+                </ul>
+                <p>Jos halutaan useampia oikeuksia lasketaan oikeuksien numerot yhteen. Esim. luku ja kirjoitusoikeus on 6 (4+2) ja kaikki oikeudet 7 (4+2+1)</p>
+            </div>
 <pre class="code"><code>/var/www/tesmitys.example.com:
   file.directory:
     - user: krisu
