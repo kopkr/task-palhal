@@ -501,6 +501,7 @@ $ sudo systemctl restart salt-minion.service</code></pre>
 The key glob '*' does not match any unaccepted keys.</code></pre>
                 <p>Ei tietenkään toimi, sillä virtuaalikoneet eivät näe toisiaan. Verkkoa ei ole asetettu oikein. Mennään VirtualBoxista asettamaan kummatkin koneet yhteiseen verkkoon ja käynnistetään ne uudelleen. <a href="https://study.com/academy/lesson/how-to-network-virtual-machines-in-virtualbox.html">How to Network Virtual Machines in VirtualBox</a></p>
                 <a href="../img/h2/h2img1.jpg" target="_blank"><img src="../img/h2/h2img1.jpg" alt="h2img1"></a><br>
+                <p class="quote">Näkyvyyden ei tarvitse olla kaksisuuntainen. Ainoastaan masterin on oltava näkyvissä minionille. <i>(Lisätty 16.04.2020)</i></p>
                 <p>Kun koneet on käynnistetty uudelleen, on muutettava masterin hostname kummallakin koneella, koska se on nyt muuttunut.</p>
 <pre class="code"><code>$ hostname -I
 192.168.1.132
