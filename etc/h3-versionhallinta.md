@@ -3,7 +3,7 @@
 ## Sisällysluettelo  
 
 [Tehtävänanto](#tehtävänanto)  
-[Käytetyt laitteet](#esitietoa)  
+[Esitietoa](#esitietoa)  
 [Alkutoimet](#alkutoimet)  
 [a) Muutoksien seuranta ('git log', 'git diff', 'git blame')](#a-muutoksien-seuranta-git-log-git-diff-git-blame)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[- git log](#git-log)  
