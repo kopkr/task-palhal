@@ -225,6 +225,8 @@ Näyttää toimineen oletetusti.
 Halutaan, että VS Code muotoilee pastetun tekstin oikeaan muotoon.
 Asetuksista "File > Preferences > Text Editor > Font" laitetaan ruksi kohtaan "Format On Paste"
 
+![h3img4](../img/h3/h3img4.jpg)
+
 Katsotaan mitä tiedostoa asetus muokkasi. Alla olevalla komennolla haetaan tiedostot kansioista /etc ja /home, sekä tulostetaan niiden aika ja polku. Järjestetään niin että viimeisin muokkaus tulee alimmaiseksi.
 
     $ find /etc/ $HOME -printf '%T+ %p\n'|sort
