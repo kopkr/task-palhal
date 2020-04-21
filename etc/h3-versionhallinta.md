@@ -10,7 +10,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[- git diff](#git-diff)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[- git blame](#git-blame)  
 [b) Vanhempaan versioon paluu ('git reset --hard')](#b-vanhempaan-versioon-paluu-git-reset-\--hard)  
-[c) Uusi Salt-moduli](##c-uusi-salt\-moduli)  
+[c) Uusi Salt-moduli](#c-uusi-salt\-moduli)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[- Asennus manuaalisesti](#vs-code-asennus-manuaalisesti)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[- Konfigurointi manuaalisesti](#vs-code-konfigurointi-manuaalisesti)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[- Asennus SaltStackilla](#vs-code-asennus-saltstackilla)  
