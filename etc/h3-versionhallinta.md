@@ -199,11 +199,11 @@ Käytetään apt paketinhallinta-ohjelmaa asennukseen kuten [VS Coden](https://c
 
     $ sudo apt install ./code.deb
 
-![h3img1](..\img/h3/h3img1.jpg)
+![h3img1](../img/h3/h3img1.jpg)
 
 Tuloste näyttää hieman suppealta, mutta Visual Studio Code on asentunut koneelle. Loin testauksen vuoksi aiempaan ExampleProject kansioon ohjelmalla example.cs tiedoston.
 
-![h3img2](..\img/h3/h3img2.jpg)
+![h3img2](../img/h3/h3img2.jpg)
 
     $ cat ~/Code/ExampleProject/example.cs 
     using System;
