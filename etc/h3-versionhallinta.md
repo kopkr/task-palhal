@@ -2,9 +2,9 @@
 #### 21.04.2020 - Kristian Koponen  
 ## Sisällysluettelo  
 
-[Tehtävänanto](##tehtävänanto)  
-[Käytetyt laitteet](##käytetyt-laitteet)  
-[Alkutoimet](##alkutoimet)  
+[Tehtävänanto](#tehtävänanto)  
+[Käytetyt laitteet](#käytetyt-laitteet)  
+[Alkutoimet](#alkutoimet)  
 [a) Muutoksien seuranta ('git log', 'git diff', 'git blame')](#a-muutoksien-seuranta-git-log-git-diff-git-blame)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[- git log](#git-log)  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[- git diff](#git-diff)  
