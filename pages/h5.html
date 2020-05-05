@@ -17,20 +17,24 @@
             <li><a href="h1.html"><b>Harjoitus 1</b><br>Hello Salt!</a></li>
             <li><a href="h2.html"><b>Harjoitus 2</b><br>Package-File-Service</a></li>
             <li><a href="h3.html"><b>Harjoitus 3</b><br>Versionhallinta</a></li>
-            <li><a href="h4.html"><b>Harjoitus 4</b><br>-</a></li>
-            <li><a href="h5.html" class="active"><b>Harjoitus 5</b><br>-</a></li>
+            <li><a href="h4.html"><b>Harjoitus 4</b><br>Modulikimara</a></li>
+            <li><a href="h5.html" class="active"><b>Harjoitus 5</b><br>Muotteja ja Moduleja</a></li>
             <li><a href="h6.html"><b>Harjoitus 6</b><br>-</a></li>
             <li><a href="h7.html"><b>Harjoitus 7</b><br>-</a></li>
             <li><a href="h8.html"><b>Harjoitus 8</b><br>-</a></li>
         </ul>
     </div>
     <div class="content">
-        <h2>Harjoitus 5</h2>
-        <span>08.04.2020, Kristian Koponen<br></span>
+        <h2>Muotteja ja moduleja</h2>
+        <span>06.05.2020, Kristian Koponen<br></span>
         <div class="blueBox">
-            <h3>Tehtävänanto<br><span class="small"><a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/">Palvelinten hallinta H5</a></span></h3>
+            <h3>Tehtävänanto<br><span class="small"><a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/#h5-muotteja-ja-moduleja">Palvelinten hallinta H5</a></span></h3>
 			<ul>
-                <li><a href="h5.html#h5a">Harjoitus 5</a></li>
+                <li><a href="h5.html#h5a">Hello templates!</a></li>
+                <li><a href="h5.html#h5b">Message of the Day</a></li>
+                <li><a href="h5.html#h5c">Bash</a></li>
+                <li><a href="h5.html#h5d">Nginx</a></li>
+                <li><a href="h5.html#h5e">Lopputestaus</a></li>
             </ul>
         </div>
         <div class="blueBox">
@@ -57,14 +61,333 @@
             <p class="bold">VirtualBox 6.1</p>
             <p>xubuntu 18.04.4 amd64 ISO</p>
         </div>
+        
         <div class="blueBox">
-            <h3 id="h5a">Hello Salt!</h3>
-            
+            <h3 id="h5a">Hello templates!</h3>
+            <p class="assignment">Hello templates! Tee muotilla esimerkkitiedosto, jossa on muuttujien (esim grains) arvoja.</p>
+            <hr>
+            <p>Käytän tätä tehtävää varten apuna Tero Karvisen <a href="http://terokarvinen.com/2018/make-a-million-of-those-jinja-templating-salt-states">Make a Million of Those</a> -artikkelia. Luodaan uusi kansio ja tila.</p>
+<pre class="code"><code>$ sudo mkdir /srv/salt/info
+$ sudoedit /srv/salt/info/init.sls
+
+{% for file in ['info.txt'] %}
+/tmp/info/{{ file }}:
+  file.managed:
+    - source: salt://info/info.txt
+    - makedirs: True
+    - template: jinja
+    - context:
+      file: {{ file }}
+{% endfor %}</code></pre>
+            <p>Luodaan muotti johon tilassa viitataan.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/info/info.txt
+
+OS: {{ grains['kernel'] }} {{ grains['os'] }} {{ grains ['osrelease'] }}
+ID: {{ grains['id'] }}
+BIOS: {{ grains ['biosversion'] }}</code></pre>
+            <p>Ajetaan paikallisesti.</p>
+<pre class="code"><code>sudo salt-call --local state.apply info --state-output debug
+local:
+----------
+          ID: /tmp/info/info.txt
+    Function: file.managed
+      Result: True
+     Comment: File /tmp/info/info.txt updated
+     Started: 22:19:48.140041
+    Duration: 31.971 ms
+     Changes:   
+              ----------
+              diff:
+                  New file
+              mode:
+                  0644
+
+Summary for local
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  31.971 ms
+</code></pre>
+            <p>Luetaan äsken luotu info-tiedosto.</p>
+<pre class="code"><code>$ cat /tmp/info/info.txt 
+OS: Linux Ubuntu 18.04
+ID: wings
+BIOS: VirtualBox
+</code></pre>
+            <p>Toimii.</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h5b">Message of the Day</h3>
+            <p class="assignment">Message of the Day. Sisäänkirjautuessa näytetään päivän viesti. Lisää päivän viestiin tietoa ympäristöstä käyttäen muotteja. Sopiva tiedosto on /etc/motd.</p>
+            <hr>
+            <p>Muokataan aiemmin luotua templatea, ja lisätään siihen asiaankuuluva tervehdys. <a href="http://www.network-science.de/ascii/">ASCII generator</a></p>
+<pre class="code"><code>$ sudoedit /srv/salt/info/info.txt
+
+----------------------------------------------------------
+___________                        __        .__
+\__    ___/_____________  __ _____/  |_ __ __|  |   _________
+  |    |_/ __ \_  __ \  \/ // __ \   __\  |  \  |  /  _ \__  \
+  |    |\  ___/|  | \/\   /\  ___/|  | |  |  /  |_(  &lt;_&gt; ) __ \_
+  |____| \___  &gt;__|    \_/  \___  &gt;__| |____/|____/\____(____  /
+             \/                 \/                           \/ 
+---------------------------------------------------------- 
+
+
+OS: {{ grains['kernel'] }} {{ grains['os'] }} {{ grains ['osrelease'] }}
+ID: {{ grains['id'] }}
+BIOS: {{ grains ['biosversion'] }}
+</code></pre>
+            <p>Muokataan myös tilaa, jotta se ajaa viestin MOTD-tiedoston tilalle.</p>
+<pre class="code"><code>{% for file in ['motd'] %}
+/etc/{{ file }}:
+  file.managed:
+    - source: salt://info/info.txt
+    - makedirs: True
+    - template: jinja
+    - context:
+      file: {{ file }}
+{% endfor %}</code></pre>
+            <p>Ajetaan tila.</p>
+<pre class="code"><code>$ sudo salt 'wings' state.apply info
+wings:
+----------
+          ID: /etc/motd
+    Function: file.managed
+      Result: True
+     Comment: File /etc/motd updated
+     Started: 22:45:25.539088
+    Duration: 40.67 ms
+     Changes:   
+              ----------
+              diff:
+                  --- 
+                  +++ 
+                  @@ -1,4 +1,12 @@
+                  +----------------------------------------------------------
+                  +___________                        __        .__                
+                  +\__    ___/_____________  __ _____/  |_ __ __|  |   _________   
+                  +  |    |_/ __ \_  __ \  \/ // __ \   __\  |  \  |  /  _ \__  \  
+                  +  |    |\  ___/|  | \/\   /\  ___/|  | |  |  /  |_(  &lt;_&gt; ) __ \_
+                  +  |____| \___  &gt;__|    \_/  \___  &gt;__| |____/|____/\____(____  /
+                  +             \/                 \/                           \/ 
+                  +----------------------------------------------------------
+                  +
+                   
+                   OS: Linux Ubuntu 18.04
+                   ID: wings
+
+Summary for wings
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  40.670 ms
+</code></pre>
+            <p>Asennetaan SSH (saltilla) ja kirjaudutaan sen kautta sisään, että nähdään viesti.</p>
+<pre class="code"><code>$ sudo salt 'wings' pkg.install ssh
+$ ssh localhost
+</code></pre>
+            <p>SSH olikin jo asennettu aiemmin. Uusi viesti näkyy kirjautumisen yhteydessä. Näkyy toimineen.</p>
+            <a href="../img/h5/h5img1.jpg" target="_blank"><img src="../img/h5/h5img1.jpg" alt="h5img1"></a><br>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h5c">Bash</h3>
+            <p class="assignment">Bash. Tee bashiin asetuksia Saltilla. Ensin käsin, vasta toimivaa automatisoidaan. Muista testata lopputulos käyttäjän näkökulmasta.</p>
+            <hr>
+            <p>Muokataan ensin Bashia manuaalisesti. <a href="https://www.howtogeek.com/307701/how-to-customize-and-colorize-your-bash-prompt/">How to customize and colorize your bash prompt</a> -artikkeli auttaa. Otetaan ensin nykyinen tilanne talteen defaultiksi DEFAULT-komennolla.</p>
+<pre class="code"><code>$ DEFAULT=$PS1
+$ PS1="\[\033[1;36m\]\u@\h\[\033[0;37m\]:\[\033[1;34m\]\w\[\033[0;37m\]\$ "</code></pre>
+            <a href="../img/h5/h5img2.jpg" target="_blank"><img src="../img/h5/h5img2.jpg" alt="h5img2"></a><br>
+            <p>Artikkelista jo selvisi missä tiedostossa asetukset ovat. Luodaan uusi salt tilakansio ja haetaan tiedosto sinne.</p>
+<pre class="code"><code>$ sudo mkdir /srv/salt/bashrc
+$ sudo cp /home/krisu/.bashrc /srv/salt/bashrc/.bashrc
+$ sudoedit /srv/salt/bashrc/init.sls
+$ cat /srv/salt/bashrc/init.sls
+/home/krisu/.bashrc:
+  file.managed:
+    - source: salt://bashrc/.bashrc 
+    - user: krisu
+    - group: krisu
+    - mode: 644
+</code></pre>
+            <p>Muokataan .bashrc tiedostoa saltin kansioissa.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/bashrc/.bashrc
+
+...
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[1;36m\]\u@\h\[\033[0;37m\]:\[\033[1;34m\]\w\[\033[0;37m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+...</code></pre>
+            <p>Avataan terminaali uudestaan, jotta nähdään alkuperäinen. Ajetaan tila läpi. Avataan sitten taas terminaali että nähdään muutos.</p>
+<pre class="code"><code>$ sudo salt 'wings' state.apply bashrc</code></pre>
+            <a href="../img/h5/h5img3.jpg" target="_blank"><img src="../img/h5/h5img3.jpg" alt="h5img3"></a><br>
+            <p>Muutos toimi.</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h5d">Nginx</h3>
+            <p class="assignment">Nginx. Tee nginx-weppipalvelimeen asetuksia Saltilla. Voit esimerkiksi tehdä uuden site:n, niin että etusivu vaihtuu. Kun nginx on todennäköisesti sinulle uusi palvelin, tässä tehtävässä on siis ensin laaja osuus valita sopiva asetus nginx:lle ja saada se toimimaan käsin. Vasta toimivaa, käsin kokeiltua kannattaa automatisoida. Muista lopputuloksen testaus käyttäjän näkökulmasta.</p>
+            <hr>
+            <h4>Asennus ja konfigurointi manuaalisesti</h4>
+            <p>Asennetaan Nginx</p>
+<pre class="code"><code>$ sudo apt-get install nginx -y</code></pre>
+            <p>Testataan että oletussivu näkyy.</p>
+            <pre class="code"><code>$ curl localhost</code></pre>
+            <a href="../img/h5/h5img4.jpg" target="_blank"><img src="../img/h5/h5img4.jpg" alt="h5img4"></a><br>
+            <p>Muokataan oletussivun sisältöä.</p>
+            <pre class="code"><code>$ echo ”jei”|sudo tee /var/www/html/index.nginx-debian.html
+”jei”
+$ curl localhost
+”jei”
+</code></pre>
+            <p>Käydään katsomassa Nginx-konfiguraatioita. Default-tiedostossa on ohjeita palvelimen konfigurointiin. Näyttää toimivan suht. samalla tavalla kuin Apache2.</p>
+<pre class="code"><code>$ less /etc/nginx/sites-available/default</code></pre>
+            <p>Luodaan omaan kotihakemistoon uusi kansio ja html-sivu.</p>
+<pre class="code"><code>$ cd
+$ mkdir -p Sites/testi.example.com
+$ nano Sites/testi.example.com/index.html
+$ cat Sites/testi.example.com/index.html 
+Hello, Nginx!</code></pre>
+            <p>Luodaan Nginx konfiguraatio-kansioon uusi Virtual Host tiedosto. Lueskelen lisää ohjeita <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-server-blocks-virtual-hosts-on-ubuntu-16-04">täältä</a>.</p>
+            <pre class="code"><code>$ sudoedit /etc/nginx/sites-available/testi.example.com
+$ cat /etc/nginx/sites-available/testi.example.com 
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+	root /home/krisu/Sites/testi.example.com;
+	index index.html
+
+	server_name testi.example.com;
+	
+	location / {
+                try_files $uri $uri/ =404;
+        }
+}</code></pre>
+            <p>Luodaan symbolinen linkki sites-enabled kansioon ja tarkistetaan syntaksi-virheiden varalta.</p>
+<pre class="code"><code>$ sudo ln -s /etc/nginx/sites-available/testi.example.com /etc/nginx/sites-enabled/
+$ sudo nginx -t
+nginx: [emerg] a duplicate default server for 0.0.0.0:80 in /etc/nginx/sites-enabled/testi.example.com:2
+nginx: configuration file /etc/nginx/nginx.conf test failed</code></pre>
+            <p>Oletettavasti on poistettava default-tiedosto sites-enabled kansiosta.</p>
+<pre class="code"><code>$ sudo rm /etc/nginx/sites-enabled/default
+$ sudo nginx -t
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful</code></pre>
+            <p>Nyt konfiguraatiot näyttävät olevan ok. Käynnistetään Nginx uudestaan ja testataan.</p>
+<pre class="code"><code>$ sudo systemctl restart nginx
+$ curl localhost
+Hello, Nginx!</code></pre>
+            <p>Näyttää toimivan.</p>
+            <hr>
+            <h4>Asennus ja konfigurointi SaltStackilla</h4>
+            <p>Luodaan tila joka luo kotihakemistoon kansion ja sivun.</p>
+<pre class="code"><code>$ sudo mkdir /srv/salt/testiexamplecom
+$ sudo cp /home/krisu/Sites/testi.example.com/index.html /srv/salt/testiexamplecom/
+$ sudoedit /srv/salt/testiexamplecom/init.sls
+
+{% for file in ['index.html'] %}
+/home/krisu/Sites/testi.example.com/{{ file }}:
+  file.managed:
+    - source: salt://testiexamplecom/index.html
+    - makedirs: True
+    - user: krisu
+    - group: krisu
+    - mode: 664
+    - template: jinja
+    - context:
+      file: {{ file }}
+{% endfor %}
+</code></pre>
+            <p>Luodaan tila joka asentaa ja konfiguroi Nginxin.</p>
+<pre class="code"><code>$ sudo mkdir /srv/salt/nginx
+$ sudo cp /etc/nginx/sites-available/testi.example.com /srv/salt/nginx/
+$ sudoedit /srv/salt/nginx/init.sls
+
+<span style="color:aqua">#Asenna nginx</span>
+nginx:
+  pkg.installed
+
+<span style="color:aqua">#Lisää testi.example.com konfiguraatiot</span>
+/etc/nginx/sites-available/testi.example.com:
+  file.managed:
+    - source: salt://nginx/testi.example.com
+
+/etc/nginx/sites-enabled/testi.example.com:
+  file.managed:
+    - source: salt://nginx/testi.example.com
+
+<span style="color:aqua">#Poista oletuskonfiguraatio</span>
+/etc/nginx/sites-enabled/default:
+  file.absent
+
+<span style="color:aqua">#Käynnistä uudelleen</span>
+nginx2service:
+  service.running:
+    - name: nginx
+    - watch:
+      - file: /etc/nginx/sites-enabled/default
+      - file: /etc/nginx/sites-enabled/testi.example.com</code></pre>
+            <p>Muokataan top.sls tiedosto ja ajetaan tila</p>
+<pre class="code"><code>$ sudoedit /srv/salt/top.sls 
+$ cat /srv/salt/top.sls
+base:
+  '*':
+    - testiexamplecom
+    - nginx
+$ sudo salt 'wings' stat
+...
+Summary for wings
+------------
+Succeeded: 6
+Failed:    0
+------------
+Total states run:     6
+Total run time:   1.857 s</code></pre>
         </div>
         <div class="blueBox">
-            <h3>Lähteet</h3>
+            <h3 id="h5e">Lopputestaus</h3>
+            <p>Lisätään aiempien tehtävien tilat myös top.sls tiedostoon ja ajetaan kaikki tämän päivän harjoitukset puhtaalle minionille.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/top.sls
+$ cat /srv/salt/top.sls
+base:
+  '*':
+    - info
+    - bashrc
+    - testiexamplecom
+    - nginx
+$ sudo salt 'feather1' state.apply
+...
+Summary for feather1
+------------
+Succeeded: 8 (changed=8)
+Failed:    0
+------------
+Total states run:     8
+Total run time:  20.438 s
+
+</code></pre>
+            <a href="../img/h5/h5img5.jpg" target="_blank"><img src="../img/h5/h5img5.jpg" alt="h5img5"></a><br>
+            <p>Kuvankaappauksesta nähdään että Bash-komentorivin väri on kuten aiemmin asetettu, SSH:lla kirjautuessa nähdään viesti, ja localhostissa komeilee käyttäjän kotihakemistossa sijaitseva index.html.</p>
+            <h4>Johtopäätös</h4>
+            <p>Kaikki toimii.</p>
+        </div>
+        <div class="blueBox">
+            <h3>Lähteet ja materiaalit</h3>
             <p>
                 <a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/">http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/</a><br>
+                <a href="http://terokarvinen.com/2018/make-a-million-of-those-jinja-templating-salt-states">http://terokarvinen.com/2018/make-a-million-of-those-jinja-templating-salt-states</a><br>
+                <a href="http://www.network-science.de/ascii/">http://www.network-science.de/ascii/</a><br>
+                <a href="https://www.howtogeek.com/307701/how-to-customize-and-colorize-your-bash-prompt/">https://www.howtogeek.com/307701/how-to-customize-and-colorize-your-bash-prompt/</a><br>
+                <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-server-blocks-virtual-hosts-on-ubuntu-16-04">https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-server-blocks-virtual-hosts-on-ubuntu-16-04</a><br>
             </p>
         </div>
     </div>
