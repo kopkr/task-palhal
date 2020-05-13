@@ -19,18 +19,22 @@
             <li><a href="h3.html"><b>Harjoitus 3</b><br>Versionhallinta</a></li>
             <li><a href="h4.html"><b>Harjoitus 4</b><br>Modulikimara</a></li>
             <li><a href="h5.html"><b>Harjoitus 5</b><br>Muotteja ja Moduleja</a></li>
-            <li><a href="h6.html" class="active"><b>Harjoitus 6</b><br>-</a></li>
+            <li><a href="h6.html" class="active"><b>Harjoitus 6</b><br>Yksi totuus</a></li>
             <li><a href="h7.html"><b>Harjoitus 7</b><br>-</a></li>
             <li><a href="h8.html"><b>Harjoitus 8</b><br>-</a></li>
         </ul>
     </div>
     <div class="content">
-        <h2>Harjoitus 6</h2>
-        <span>08.04.2020, Kristian Koponen<br></span>
+        <h2>Yksi totuus</h2>
+        <span>13.05.2020, Kristian Koponen<br></span>
         <div class="blueBox">
-            <h3>Tehtävänanto<br><span class="small"><a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/">Palvelinten hallinta H6</a></span></h3>
+            <h3>Tehtävänanto<br><span class="small"><a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/#h6-yksi-totuus">Palvelinten hallinta H6</a></span></h3>
 			<ul>
-                <li><a href="h6.html#h6a">Harjoitus 6</a></li>
+                <li><a href="h6.html#h6a">Asenna CentOS</a></li>
+                <li><a href="h6.html#h6b">Grains.items</a></li>
+                <li><a href="h6.html#h6c">MOTD</a></li>
+                <li><a href="h6.html#h6d">Tiedosto kahdelle eri perheen distrolle</a></li>
+                <li><a href="h6.html#h6e">Apache kahdelle eri perheen distrolle</a></li>
             </ul>
         </div>
         <div class="blueBox">
@@ -55,15 +59,348 @@
                 </tr>
             </table>
             <p class="bold">VirtualBox 6.1</p>
-            <p>xubuntu 18.04.4 amd64 ISO</p>
+            <p>xubuntu 18.04.4 amd64 ISO
+            CentOS 8.1.1911 ISO</p>
         </div>
+          
         <div class="blueBox">
-            <h3 id="h6a">Hello Salt!</h3>
+            <h3 id="h6a">Asenna CentOS</h3>
+            <p class="assignment">Asenna jokin toinen Linux-levityspaketti orjaksi Saltille. CentOS on hyvä vaihtoehto. Voit esimerkiksi asentaa CentOS:n VirtualBoxiin ja tehdä koneiden välille virtuaaliverkon. Jos käytät Vagrantia, 'cent.vm.box = "centos/7"' on kätevä.</p>
+            <hr>
+            <h4>CentOS VirtualBox</h4>
+            <p>Luodaan uusi virtuaalikone VirtualBoxissa. <a href="h1.html#h1a">VirtualBox</a></p>
+            <a href="../img/h6/h6img1.jpg" target="_blank"><img src="../img/h6/h6img1.jpg" alt="h6img1"></a><br>
+            <p>Asetetaan virtuaalikone verkkoon.</p>
+            <a href="../img/h6/h6img2.jpg" target="_blank"><img src="../img/h6/h6img2.jpg" alt="h6img2"></a><br>
+            <p>Ladataan uusin CentOS ISO-tiedosto <a href="https://www.centos.org/download/">CentOS:n sivuilta</a>. Raportin kirjoittamishetkellä versio 8.1.1911. Laitetaan ladattu levykuva virtuaalikoneeseen. Valitaan koneen käynnistyttyä "Test this media & install CentOS Linux 8"</p>
+            <a href="../img/h6/h6img3.jpg" target="_blank"><img src="../img/h6/h6img3.jpg" alt="h6img3"></a><br>
+            <p>Asennusvaiheessa muutetaan näppäimistöasetuksia, aikavyöhyke, ohjelmistopohja ja asennuspaikka. Painetaan "Begin Installation".</p>
+            <a href="../img/h6/h6img4.jpg" target="_blank"><img src="../img/h6/h6img4.jpg" alt="h6img4"></a><br>
+            <p>Asennuksen aikana asetetaan root-salasana ja luodaan käyttäjätunnus. Kun asennus on valmis, painetaan "Reboot".</p>
+            <a href="../img/h6/h6img5.jpg" target="_blank"><img src="../img/h6/h6img5.jpg" alt="h6img5"></a><br>
+            <p>Kone yrittää buutata uudelleen asennuslevyltä, joten otetaan virtuaalikoneesta levykuva pois. Uudelleenkäynnistyksen jälkeen hyväksytään lisenssi. Heti alkuunsa huomaan että CentOS ei aukaise terminaalia tutulla Super+T shortcutilla. Käydään heti aluksi luomassa oma shortcut. Settings > Devices > Keyboard</p>
+            <a href="../img/h6/h6img6.jpg" target="_blank"><img src="../img/h6/h6img6.jpg" alt="h6img6"></a><br>
+            <hr>
+            <h4>Guest Additions</h4>
+            <p>Tecmintin sivuilta löytyy <a href="https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/">ohjeet</a> VBox Guest Additionsin asentamiseen. Otetaan käyttöön EPEL-repository, päivitetään ja sitten käynnistetään kone uudelleen.</p>
+<pre class="code"><code>$ sudo yum install epel-release -y
+$ sudo yum update -y
+$ shutdown -r now</code></pre>
+            <p>Asennetaan kernel headerit, dev toolsit ja muita paketteja, joita tarvitaan guest additionsin asentamiseen.</p>
+<pre class="code"><code>$ sudo yum install make gcc kernel-headers kernel-devel perl dkms bzip2 -y</code></pre>
+            <p>Asetetaan KERN_DIR ympäristömuuttuja kernel lähdekoodin hakemistoon ja exportataan.</p>
+<pre class="code"><code>$ export KERN_DIR=/usr/src/kernels/$(uname -r)</code></pre>
+            <p>Nyt mountataan Guest Additions levykuva VirtualBoxissa. Laitetaan levy virtuaalikoneeseen Devices > Insert Guest Additions CD Image. Ajetaan komennot mountille ja asennuksen ajamiselle.</p>
+<pre class="code"><code>$ sudo mount -r /dev/cdrom /media
+$ cd /media/
+$ sudo ./VBoxLinuxAdditions.run </code></pre>
+            <p>Otetaan Drag'n'drop ja Shared Clipboard käyttöön valitsemalla "Bidirectional" Devices pudotusvalikosta. Käynnistetään kone uudelleen.</p>
+<pre class="code"><code>$ shutdown -r now</code></pre>
+            <p>Hiiri liikkuu ja copypaste toimii nyt sulavasti virtuaalikoneen ja isäntäkoneen välillä, mutta virtuaalikoneen resoluutio ei muutu ikkunan kokoa muuttaessa.</p>
+            <hr>
+            <h4>Salt-minion konfiguraatio</h4>
+            <p>Asennetaan Salt-minion.</p>
+<pre class="code"><code>$ sudo yum install salt-minion</code></pre>
+            <p>Salt-minionia ei näy löytyvän. SaltStackin sivuilta löytyy <a href="https://repo.saltstack.com/#rhel">ohjeet</a> asentamiseen. Täytyy asentaa Salt-minion SaltStackin virallisesta YUM reposta.</p>
+<pre class="code"><code>$ sudo yum install https://repo.saltstack.com/py3/redhat/salt-py3-repo-latest.el8.noarch.rpm
+$ sudo yum clean expire-cache
+$ sudo yum install salt-minion -y</code></pre>
+            <p>Käydään konfiguroimassa Salt-minion.</p>
+<pre class="code"><code>$ echo ""|sudo tee /etc/salt/minion
+$ sudoedit /etc/salt/minion
+</code></pre>
+            <p>CentOS:n oletuseditori näyttää olevan Vim. Painetaan "i" tekstin kirjoittamiseen. Kirjoittamisen jälkeen painetaan Esc ja :wq (write / quit) tallentamiseen.</p>
+<pre class="code"><code>$ sudo cat /etc/salt/minion
+<span style="color:beige">master: 192.168.1.127
+id: feather2</span></code></pre>
+            <p>Käynnistetään salt-minion uudelleen</p>
+<pre class="code"><code>$ sudo systemctl restart salt-minion.service</code></pre>
+            <p>Käydään hyväksymässä uusi avain masterissa.</p>
+<pre class="code"><code>$ sudo salt-key -A feather2
+The following keys are going to be accepted:
+Unaccepted Keys:
+feather2
+Proceed? [n/Y] y
+Key for minion feather2 accepted.</code></pre>
         </div>
+        
+        <div class="blueBox">
+            <h3 id="h6b">Grains.items</h3>
+            <p class="assignment">Kerää grains.items avulla tiedot orjista, joissa on eri levityspaketti.</p>
+            <hr>
+            <p>Kaikki tiedot saadaan Grains.items komennolla, mutta tuloste olisi todella pitkä. Rajoitetaan ja kysytään orjilta vain minkä perheen ja mikä levityspaketti on käytössä.</p>
+<pre class="code"><code>$ sudo salt '*' grains.item osfinger os_family
+<span style="color:aquamarine">wings:
+    ----------
+    os_family:
+        Debian
+    osfinger:
+        Ubuntu-18.04
+feather1:
+    ----------
+    os_family:
+        Debian
+    osfinger:
+        Ubuntu-18.04
+feather2:
+    ----------
+    os_family:
+        RedHat
+    osfinger:
+        CentOS Linux-8</span>
+</code></pre>
+            <p>Kaikilta kolmelta koneelta tulee oikeat vastaukset.</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h6c">MOTD</h3>
+            <p class="assignment">Tee päivän viesti (motd), jossa koneen tyyppi tulee grains osfinger -muuttujasta. Kokeile, että saat eri levityspaketeilla eri tuloksen. Voit hyödyntää aiemmin tekemääsi motd:ia.</p>
+            <hr>
+            <p>Aiemmassa <a href="h5.html#h5b">tehtävässä</a> tehtiin MOTD, joka muokattiin sitä edeltävästä info-tehtävästä, joten tilan nimi on edelleen info. Vaihdetaan tilan nimi osuvammin "motd"</p>
+<pre class="code"><code>$ sudo mv info/ motd/
+$ sudo mv motd/info.txt motd/motd.txt
+$ sudoedit motd/init.sls
+$ cat motd/init.sls
+<span style="color:beige">/etc/motd:
+  file.managed:
+    - source: salt://motd/motd.txt
+    - makedirs: True
+    - template: jinja
+    - context:
+      file: motd</span></code></pre>
+            <p>Muokataan motd.txt muotti</p>
+<pre class="code"><code>$ sudoedit motd.txt
+$ cat motd.txt
+<span style="color:beige">-----------------------------------------------------------------
+___________                        __        .__
+\__    ___/_____________  __ _____/  |_ __ __|  |   _________
+  |    |_/ __ \_  __ \  \/ // __ \   __\  |  \  |  /  _ \__  \
+  |    |\  ___/|  | \/\   /\  ___/|  | |  |  /  |_(  &lt;_&gt; ) __ \_
+  |____| \___  &gt;__|    \_/  \___  &gt;__| |____/|____/\____(____  /
+             \/                 \/                           \/ 
+-----------------------------------------------------------------
+
+
+OS: {{ grains['osfinger'] }}
+OS Family: {{ grains['os_family'] }}
+ID: {{ grains['id'] }}
+BIOS: {{ grains ['biosversion'] }}</span>
+</code></pre>
+            <p>Ajetaan tila orjille.</p>
+<pre class="code"><code>$ sudo salt '*' state.apply motd
+...
+<span style="color:aquamarine">Summary for wings
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  71.378 ms</span>
+...
+<span style="color:aquamarine">Summary for feather1
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  53.086 ms</span>
+...
+<span style="color:aquamarine">Summary for feather2
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time: 142.823 ms</span>
+</code></pre>
+            <p>Kirjaudutaan SSH:lla kummallekin koneelle, jotta nähdään tulos.</p>
+            <a href="../img/h6/h6img7.jpg" target="_blank"><img src="../img/h6/h6img7.jpg" alt="h6img7"></a><br>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h6d">Tiedosto kahdelle eri perheen distrolle</h3>
+            <p class="assignment">Tee tila, joka tekee RedHat-perheellä (esim. CentOS) tiedoston /tmp/redhat ja Debian-perheellä (esim Ubuntu) tiedoston /tmp/debian. Voit käyttää mitä vain eri perheiden levityspaketteja.</p>
+            <hr>
+            <p>Luodaan tilalle uusi kansio</p>
+            <pre class="code"><code>$ sudo mkdir /srv/salt/tmpfile</code></pre>
+            <p>Hain jinjan if-else lausekkeiden syntaksia. Löysin <a href="http://terokarvinen.com/2018/configure-windows-and-linux-with-salt-jinja-if-else-and-grains">Configure Windows and Linux with Single Salt Module</a> ja <a href="https://jinja.palletsprojects.com/en/2.11.x/templates/">Template Designer Documentation</a>. Luodaan init.sls tiedosto ja muottitiedosto</p>
+<pre class="code"><code>$ sudoedit /srv/salt/tmpfile/init.sls
+$ cat /srv/salt/tmpfile/init.sls
+<span style="color:beige">{% if grains['os_family'] == 'Debian' %}
+{%	set file = "debian" %}
+{% elif grains['os_family'] == 'RedHat' %}
+{%	set file = "redhat" %}
+{% endif %}
+/tmp/{{ file }}:
+  file.managed:
+    - source: salt://tmpfile/file.txt
+    - template: jinja
+    - context:
+      file: {{ file }}</span>
+$ sudoedit /srv/salt/tmpfile/file.txt
+$ cat /srv/salt/tmpfile/file.txt 
+<span style="color:beige">Tämä distro ({{ grains['osfinger'] }}), kuuluu {{ grains['os_family'] }} perheeseen.</span>
+</code></pre>
+            <p>Ajetaan tila orjille.</p>
+<pre class="code"><code>$ sudo salt '*' state.apply tmpfile
+...
+<span style="color:aquamarine">Summary for wings
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  68.560 ms</span>
+...
+<span style="color:aquamarine">Summary for feather2
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time: 130.145 ms </span>
+...
+<span style="color:aquamarine">Summary for feather1
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  56.521 ms</span>
+</code></pre>
+            <p>Luetaan /tmp/redhat ja /tmp/debian tiedostot niitä vastaavilta koneilta.</p>
+            <pre class="code"><code>$ sudo salt 'feather1' cmd.run 'cat /tmp/debian'
+$ sudo salt 'feather2' cmd.run 'cat /tmp/redhat'</code></pre>
+            <a href="../img/h6/h6img8.jpg" target="_blank"><img src="../img/h6/h6img8.jpg" alt="h6img8"></a><br>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h6e">Apache kahdelle eri perheen distrolle</h3>
+            <p class="assignment">Tee tila, joka asentaa ja konfiguroi Apachen kahteen erilaiseen järjestelmään, esim. CentOS ja Ubuntu. Paketin nimi on CentOS:ssa "httpd". Käytä Salt-koodin generointia muoteilla.</p>
+            <hr>
+            <p>Viimeisen tehtävän aikana asennettiin Nginx. Poistetaan se, jotta Apache toimii.</p>
+<pre class="code"><code>$ sudo salt '*' cmd.run 'systemctl stop nginx.service'
+$ sudo salt '*' cmd.run 'systemctl disable nginx.service'
+$ sudo salt '*' pkg.purge nginx
+$ sudo salt '*' pkg.purge nginx-common
+</code></pre>
+            <p>Luodaan uusi tilakansio ja init.sls.</p>
+<pre class="code"><code>$ sudo mkdir /srv/salt/apache2
+$ cat /srv/salt/apache2/init.sls
+<span style="color:beige">{% if grains['os_family'] == 'Debian' %}
+{%	set package = "apache2" %}
+{% elif grains['os_family'] == 'RedHat' %}
+{%	set package = "httpd" %}
+{% endif %}
+{{ package }}:
+  pkg.installed</span>
+</code></pre>
+            <p>Ajetaan tila orjille</p>
+<pre class="code"><code>$ sudo salt '*' state.apply apache2
+...
+<span style="color:aquamarine">Summary for feather1
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  38.482 s</span>
+...
+<span style="color:aquamarine">Summary for wings
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  39.165 s </span>
+...
+<span style="color:aquamarine">Summary for feather2
+------------
+Succeeded: 1 (changed=1)
+Failed:    0
+------------
+Total states run:     1
+Total run time:  29.165 s</span></code></pre>
+            <a href="../img/h6/h6img9.jpg" target="_blank"><img src="../img/h6/h6img9.jpg" alt="h6img9"></a><br>
+            <p>Muokataan vielä oletussivu kaikilla orjilla.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/apache2/init.sls
+$ cat /srv/salt/apache2/init.sls
+...
+<span style="color:beige">/var/www/html/index.html:
+  file.managed:
+    - source: salt://apache2/index.html
+    - template: jinja</span></code></pre>
+<pre class="code"><code>$ sudoedit /srv/salt/apache2/index.html
+$ cat /srv/salt/apache2/index.html
+<span style="color:beige">Toimii.&lt;br&gt;
+{{ grains['osfinger'] }}</span></code></pre>
+            <p>Ajetaan tila taas orjille.</p>
+<pre class="code"><code>$ sudo salt '*' state.apply apache2</code></pre>
+            <p>Tarkastetaan localhost kaikilla orjilla.</p>
+            <pre class="code"><code>$ sudo salt '*' cmd.run 'curl -sS localhost'</code></pre>
+            <a href="../img/h6/h6img10.jpg" target="_blank"><img src="../img/h6/h6img10.jpg" alt="h6img10"></a><br>
+            <p>Localhostiin ei saatu yhteyttä CentOS-koneella. Arvelen ettei palvelin ole käynnissä.</p>
+<pre class="code"><code>$ sudo salt 'feather2' cmd.run 'systemctl status httpd'
+<span style="color:aquamarine">feather2:</span>
+<span style="color:limegreen">    * httpd.service - The Apache HTTP Server
+       Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; vendor preset: disabled)
+       Active: inactive (dead)
+         Docs: man:httpd.service(8)</span></code></pre>
+            <p>Lisätään init.sls:n käynnistystila.</p>
+<pre class="code"><code>$ sudoedit /srv/salt/apache2/init.sls 
+$ cat /srv/salt/apache2/init.sls 
+<span style="color:beige">{% if grains['os_family'] == 'Debian' %}
+{%	set package = "apache2" %}
+{% elif grains['os_family'] == 'RedHat' %}
+{%	set package = "httpd" %}
+{% endif %}
+{{ package }}:
+  pkg.installed
+
+/var/www/html/index.html:
+  file.managed:
+    - source: salt://apache2/index.html
+    - template: jinja
+
+{{ package }}.service:
+  service.running</span></code></pre>
+            <p>Ajetaan tila orjille vielä kerran.</p>
+<pre class="code"><code>$ sudo salt '*' state.apply apache2
+...
+<span style="color:aquamarine">          ID: httpd.service
+    Function: service.running
+      Result: True
+     Comment: Started Service httpd.service
+     Started: 15:18:08.760119
+    Duration: 405.087 ms
+     Changes:   
+              ----------
+              httpd.service:
+                  True
+
+Summary for feather2
+------------
+Succeeded: 3 (changed=1)
+Failed:    0
+------------
+Total states run:     3
+Total run time:   4.598 s</span>
+</code></pre>
+            <p>Kokeillaan uudelleen localhostia.</p>
+            <pre class="code"><code>$ sudo salt '*' cmd.run 'curl -sS localhost'</code></pre>
+            <a href="../img/h6/h6img11.jpg" target="_blank"><img src="../img/h6/h6img11.jpg" alt="h6img11"></a><br>
+            <p>Kuten kuvasta näkyy. Toimii.</p>
+        </div>
+        
         <div class="blueBox">
             <h3>Lähteet</h3>
             <p>
                 <a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/">http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/</a><br>
+                <a href="https://www.centos.org/download/">https://www.centos.org/download/</a><br>
+                <a href="https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/">https://www.tecmint.com/install-virtualbox-guest-additions-in-centos-rhel-fedora/</a><br>
+                <a href="https://repo.saltstack.com/#rhel">https://repo.saltstack.com/#rhel</a><br>
+                <a href="http://terokarvinen.com/2018/configure-windows-and-linux-with-salt-jinja-if-else-and-grains">http://terokarvinen.com/2018/configure-windows-and-linux-with-salt-jinja-if-else-and-grains</a><br>
+                <a href="https://jinja.palletsprojects.com/en/2.11.x/templates/">https://jinja.palletsprojects.com/en/2.11.x/templates/</a><br>
             </p>
         </div>
     </div>
