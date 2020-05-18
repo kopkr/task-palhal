@@ -3,6 +3,7 @@
 <head>
     <title>Palvelinten hallinta</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <link rel="stylesheet" type="text/css" href="../css/index.css">
 </head>
 <body>
@@ -20,8 +21,7 @@
             <li><a href="h4.html"><b>Harjoitus 4</b><br>Modulikimara</a></li>
             <li><a href="h5.html"><b>Harjoitus 5</b><br>Muotteja ja Moduleja</a></li>
             <li><a href="h6.html" class="active"><b>Harjoitus 6</b><br>Yksi totuus</a></li>
-            <li><a href="h7.html"><b>Harjoitus 7</b><br>-</a></li>
-            <li><a href="h8.html"><b>Harjoitus 8</b><br>-</a></li>
+            <li><a href="h7.html"><b>Harjoitus 7</b><br>Oma moduli</a></li>
         </ul>
     </div>
     <div class="content">
@@ -59,7 +59,7 @@
                 </tr>
             </table>
             <p class="bold">VirtualBox 6.1</p>
-            <p>xubuntu 18.04.4 amd64 ISO
+            <p>xubuntu 18.04.4 amd64 ISO<br>
             CentOS 8.1.1911 ISO</p>
         </div>
           
@@ -130,7 +130,7 @@ Key for minion feather2 accepted.</code></pre>
             <hr>
             <p>Kaikki tiedot saadaan Grains.items komennolla, mutta tuloste olisi todella pitkä. Rajoitetaan ja kysytään orjilta vain minkä perheen ja mikä levityspaketti on käytössä.</p>
 <pre class="code"><code>$ sudo salt '*' grains.item osfinger os_family
-<span style="color:aquamarine">wings:
+<span style="color:mediumaquamarine">wings:
     ----------
     os_family:
         Debian
@@ -189,25 +189,25 @@ BIOS: {{ grains ['biosversion'] }}</span>
             <p>Ajetaan tila orjille.</p>
 <pre class="code"><code>$ sudo salt '*' state.apply motd
 ...
-<span style="color:aquamarine">Summary for wings
+<span style="color:mediumaquamarine">Summary for wings
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine"></span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     1
 Total run time:  71.378 ms</span>
 ...
-<span style="color:aquamarine">Summary for feather1
+<span style="color:mediumaquamarine">Summary for feather1
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     1
 Total run time:  53.086 ms</span>
 ...
-<span style="color:aquamarine">Summary for feather2
+<span style="color:mediumaquamarine">Summary for feather2
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     1
@@ -244,25 +244,25 @@ $ cat /srv/salt/tmpfile/file.txt
             <p>Ajetaan tila orjille.</p>
 <pre class="code"><code>$ sudo salt '*' state.apply tmpfile
 ...
-<span style="color:aquamarine">Summary for wings
+<span style="color:mediumaquamarine">Summary for wings
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     1
 Total run time:  68.560 ms</span>
 ...
-<span style="color:aquamarine">Summary for feather2
+<span style="color:mediumaquamarine">Summary for feather2
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     1
 Total run time: 130.145 ms </span>
 ...
-<span style="color:aquamarine">Summary for feather1
+<span style="color:mediumaquamarine">Summary for feather1
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     1
@@ -298,25 +298,25 @@ $ cat /srv/salt/apache2/init.sls
             <p>Ajetaan tila orjille</p>
 <pre class="code"><code>$ sudo salt '*' state.apply apache2
 ...
-<span style="color:aquamarine">Summary for feather1
+<span style="color:mediumaquamarine">Summary for feather1
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     1
 Total run time:  38.482 s</span>
 ...
-<span style="color:aquamarine">Summary for wings
+<span style="color:mediumaquamarine">Summary for wings
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:#8fbbbd">
 Failed:    0
 ------------
 Total states run:     1
 Total run time:  39.165 s </span>
 ...
-<span style="color:aquamarine">Summary for feather2
+<span style="color:mediumaquamarine">Summary for feather2
 ------------
-Succeeded: 1 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     1
@@ -341,8 +341,8 @@ $ cat /srv/salt/apache2/index.html
             <a href="../img/h6/h6img10.jpg" target="_blank"><img src="../img/h6/h6img10.jpg" alt="h6img10"></a><br>
             <p>Localhostiin ei saatu yhteyttä CentOS-koneella. Arvelen ettei palvelin ole käynnissä.</p>
 <pre class="code"><code>$ sudo salt 'feather2' cmd.run 'systemctl status httpd'
-<span style="color:aquamarine">feather2:</span>
-<span style="color:limegreen">    * httpd.service - The Apache HTTP Server
+<span style="color:mediumaquamarine">feather2:</span>
+<span style="color:#5fff5f">    * httpd.service - The Apache HTTP Server
        Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; vendor preset: disabled)
        Active: inactive (dead)
          Docs: man:httpd.service(8)</span></code></pre>
@@ -367,7 +367,7 @@ $ cat /srv/salt/apache2/init.sls
             <p>Ajetaan tila orjille vielä kerran.</p>
 <pre class="code"><code>$ sudo salt '*' state.apply apache2
 ...
-<span style="color:aquamarine">          ID: httpd.service
+<span style="color:mediumaquamarine">          ID: httpd.service
     Function: service.running
       Result: True
      Comment: Started Service httpd.service
@@ -380,7 +380,7 @@ $ cat /srv/salt/apache2/init.sls
 
 Summary for feather2
 ------------
-Succeeded: 3 (changed=1)
+</span><span style="color:#5fff5f">Succeeded: 3 (changed=1)</span><span style="color:mediumaquamarine">
 Failed:    0
 ------------
 Total states run:     3

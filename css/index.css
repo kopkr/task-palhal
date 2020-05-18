@@ -82,12 +82,12 @@ hr {
 
 .content {
     text-align: left;
-    margin: -70px 0px 0px 300px;
-    padding-bottom:50px;
     font-family: Calibri, Helvetica, sans-serif;
     color: #01543e;
-    position: relative;
-    top:-360px;
+    position: absolute;
+    left:290px;
+    top: 110px;
+    padding-bottom:50px;
 }
 .content ul {
     position:relative;
@@ -110,7 +110,7 @@ hr {
     width: 75%;
     border-radius:3px;
     border-left: solid 4px #005e45;
-    box-shadow: 5px 5px 5px #d1d1d1;
+    box-shadow: 3px 3px 5px #d1d1d1;
 }
 
 .content table, th, td {
@@ -203,4 +203,24 @@ h4 {
 .taskerror b {
     margin-left:6px;
     color:darkgoldenrod;
+}
+
+@media only screen and (max-width: 768px) {
+    .navBar ul {
+        width:100%;
+    }
+    .navBar ul li {
+        border-bottom:solid #005e45 1px;
+        background-color:white;
+        text-align:center;
+    }
+    
+    .content {
+        width:90%;
+        left:20px;
+        top:490px;
+    }   
+    .blueBox {
+        width:95%;
+    }
 }
