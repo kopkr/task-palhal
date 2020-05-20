@@ -658,7 +658,7 @@ tmux:\x20 28641           krisu    6u  unix 0xffff982735953400      0t0 514432 /
 
 send="`printf \"$*\r\"`"
 attach='script /dev/null -qc "tmux attach -t terrariaserver"'
-inject="tmux send-keys -t terrariaserver help ENTER"
+inject="tmux send-keys -t terrariaserver $send ENTER"
 
 if [ "$1" = "attach" ] ; then cmd="$attach" ; else cmd="$inject" ; fi
 
