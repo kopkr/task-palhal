@@ -150,15 +150,6 @@ hr {
     font-weight:bold;
 }
 
-.code {
-    background-color: darkslategray;
-    color:white;
-    padding:10px 10px;
-    font-family:monospace;
-    font-weight:bold;
-    overflow:scroll;
-}
-
 .assignment {
     background-color: #d4ebf2;
     padding:5px;
@@ -198,12 +189,63 @@ h4 {
     margin:3px;
     padding:5px;
     opacity: 0.96;
+    font-size:90%;
 }
 
 .taskerror b {
     margin-left:6px;
     color:darkgoldenrod;
+    font-size:90%;
 }
+
+/*-------------Code field-------------*/
+
+pre {
+    background-color: darkslategray;
+    color:white;
+    padding:10px 10px;
+    font-family:monospace;
+    font-weight:bold;
+    overflow:scroll;
+}
+
+.filepath {
+    background-color: #546f6f;
+    padding:3px;
+    color:lightgoldenrodyellow;
+    line-height: 250%;
+    font-weight:bold;
+    position:relative;
+    right:2px;
+    bottom:5px;
+    font-size:125%;
+}
+
+.bluetxt {
+    color:skyblue;
+}
+
+.deepbluetxt {
+    color:deepskyblue;
+}
+
+.greentxt {
+    color:#3bd03c;
+}
+
+.brightgreentxt {
+    color:greenyellow;
+}
+
+.redtxt {
+    color:#fc6c6c;
+}
+
+.beigetxt {
+    color:beige
+}
+
+/*-------------Responsivity-------------*/
 
 @media only screen and (max-width: 768px) {
     body, html { 
@@ -230,6 +272,5 @@ h4 {
     }   
     .blueBox {
         width:94%;
-        margin:0px;
     }
 }

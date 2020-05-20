@@ -34,12 +34,12 @@
                 <li>
                     <a href="h7.html#h7a">Oma moduli</a>
                     <ul>
-                        <li><a href="h7.html#h7a1">Alku</a></li>
-                        <li><a href="h7.html#h7a2">Alku</a></li>
-                        <li><a href="h7.html#h7a3">Alku</a></li>
-                        <li><a href="h7.html#h7a4">Alku</a></li>
-                        <li><a href="h7.html#h7a5">Alku</a></li>
-                        <li><a href="h7.html#h7a6">Alku</a></li>
+                        <li><a href="h7.html#h7a1">Palomuuri</a></li>
+                        <li><a href="h7.html#h7a2">Terraria pelipalvelimen lataus ja asennus</a></li>
+                        <li><a href="h7.html#h7a3">Käyttöoikeudet ja tekninen käyttäjä</a></li>
+                        <li><a href="h7.html#h7a4">Konfiguraatiotiedosto</a></li>
+                        <li><a href="h7.html#h7a5">Palvelimen pyöritys ja hallinta (tmux / systemd / terrariad)</a></li>
+                        <li><a href="h7.html#h7a6">Lopputestaus puhtaalla minionilla</a></li>
                     </ul>
                 </li>
             </ul>
@@ -76,16 +76,732 @@
             <hr>
             <h4>Esittely</h4>
             <p>Hiljattain Terraria-videopeliin tulleen laajan "Journey's End" pelipäivityksen myötä aikeeksi on tullut hyödyntää tulevaisuudessa omaa palvelinta Terraria-pelipalvelimen pyörittämiseen, joten tähän tehtävään aion luoda Salt-modulin joka asentaa pelipalvelimen ja konfiguroi sen käyttöä varten.</p>
-        </div>
-        
-        <div class="blueBox">
-            <h3 id="h7a1">Palvelimen asennus käsin</h3>
+            <p>Olen jo aiemmin saanut Terraria-palvelimen pyörimään Linuxilla, joten teen tämän suoraan vaiheittain ensin manuaalisesti ja sitten lisään tilaan tarvittavat muutokset, jotta sama hoituu SaltStackilla. Luodaan ensin tilalle kansio ja init.sls tiedosto.</p>
+<pre>$ sudo mkdir /srv/salt/terrariaserver
+$ sudo mkdir /srv/salt/terrariaserver/files
+$ touch /srv/salt/terrariaserver/init.sls
+$ tree /srv/salt/terrariaserver
+<span class="deepbluetxt">terrariaserver/</span>
+├── <span class="deepbluetxt">files</span>
+└── init.sls
+
+1 directory, 1 file</pre>
+            <p>Jätetään tässä vaiheessa vielä init.sls tyhjäksi.</p>
             <p>Terrarian virallisilta Wiki-sivuilta löytyy pätevä artikkeli palvelimen käyttöönottoon. Tämän lisäksi Linode-palvelintarjoaja on kirjoittanut oman ohjeensa kuinka se toimii kätevästi etäpalvelimella.</p>
             <ul>
                 <li><a href="https://terraria.gamepedia.com/Server">Official Terraria Wiki - Server</a></li>
+                <li><a href="https://terraria.gamepedia.com/Guide:Setting_up_a_Terraria_server">Official Terraria Wiki - Guide: Setting up a Terraria server</a></li>
                 <li><a href="https://www.linode.com/docs/game-servers/host-a-terraria-server-on-your-linode/">Linode - How to Setup a Terraria Linux Server</a></li>
             </ul>
-            <p></p>
+            <p>Asennuksessa käytettyjä ohjelmia.</p>
+            <pre><code>$ sudo apt-get update && sudo apt-get install wget unzip -y</code></pre>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h7a1">Palomuuri</h3>
+            <h4>Manuaalisesti</h4>
+            <p>Terraria pelipalvelimen oletusportti on 7777, joten luodaan palomuuriin reikä tälle.</p>
+<pre><code>$ sudo ufw allow 7777/tcp
+Rule added
+Rule added (v6)</code></pre>
+            <p>Helppoa kuin heinän teko.</p>
+            <hr>
+            <h4>SaltStackilla</h4>
+            <p>Nyt voidaan katsoa find-komenolla /etc/ hakemistosta mihin tiedostoihin ufw kirjoitti. Tulostetaan aika, tiedostopolku ja järjestetään ajan perusteella.</p>
+<pre><code>$ find /etc/ -printf '%T+ %p\n'|sort
+...
+2020-05-18+17:42:19.9370766300 /etc/ufw
+2020-05-18+17:59:12.8152945000 /etc/ufw/user.rules
+2020-05-18+17:59:12.8393065010 /etc/ufw/user6.rules
+</code></pre>
+            <p>Kahteen tiedostoon on lisätty seuraavanlaiset rivit.</p>
+            <a href="../img/h7/h7img1.jpg" target="_blank"><img src="../img/h7/h7img1.jpg" alt="h7img1"></a><br>
+            <div class="taskerror">
+                <p>Vietän tässä vaiheessa tunnin selvittääkseni miten saisin lisättyä säännöt tiedostoihin niin, että orjakoneen omat UFW-säännöt säilyisivät ennallaan ja tila lisäisi ainoastaan säännön portille 7777.</p>
+                <ul>
+                    <li><a href="https://docs.saltstack.com/en/latest/ref/states/all/salt.states.file.html#salt.states.file.append">file.append</a> -funktio lukee kohdetiedoston ja lisää määritellyn tekstin tiedoston perään mikäli se puuttuu. Sääntö tulee kyllä voimaan, mutta ufw komennot jälkeenpäin valittavat iptablesin käytöstä.</li>
+                    <li><a href="https://docs.saltstack.com/en/latest/ref/states/all/salt.states.file.html#salt.states.file.blockreplace">file.blockreplace</a> -funktio tekee muutoksia vain tietyn blokin sisään. UFW-säännöissä on kyllä valmis blokki "### RULES ###" ja "### END RULES ###" välillä, mutta en löytänyt tapaa jolla tämän sisälle voitaisiin appendaa, vaan nimensä mukaisesti se korvaa koko blokin sisällön.</li>
+                </ul>
+                <p>Päädyin yksinkertaiseen tapaan korvata koko tiedosto <a href="https://docs.saltstack.com/en/latest/ref/states/all/salt.states.file.html#salt.states.file.managed">file.managed</a> -funktiolla.</p>
+            </div>
+            <p>Kopioidaan nämä tiedostot saltin kansioihin</p>
+<pre><code>$ sudo cp /etc/ufw/user.rules /srv/salt/terrariaserver/files/
+$ sudo cp /etc/ufw/user6.rules /srv/salt/terrariaserver/files/</code></pre>
+            <p>Muokataan init.sls tiedostoa.</p>
+<pre><code><span class="filepath">/srv/salt/terrariaserver/init.sls</span>
+<span class="bluetxt">### UFW rules</span>
+/etc/ufw/user.rules:
+  file.managed:
+    - source: salt://terrariaserver/files/user.rules
+
+/etc/ufw/user6.rules:
+  file.managed:
+    - source: salt://terrariaserver/files/user6.rules</code></pre>
+                <p>Ajetaan tila paikallisesti.</p>
+<pre><code>$ sudo salt-call --local state.apply terrariaserver
+...
+<span class="bluetxt">Summary for local
+------------</span>
+<span class="greentxt">Succeeded: 2</span>
+<span class="bluetxt">Failed:    0
+------------
+Total states run:     2
+Total run time:  31.466 ms
+</span>
+</code></pre>
+<pre><code>$ sudo ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW       Anywhere                  
+80/tcp                     ALLOW       Anywhere                  
+4505/tcp                   ALLOW       Anywhere                  
+4506/tcp                   ALLOW       Anywhere                  
+7777/tcp                   ALLOW       Anywhere                  
+22/tcp (v6)                ALLOW       Anywhere (v6)             
+80/tcp (v6)                ALLOW       Anywhere (v6)             
+4505/tcp (v6)              ALLOW       Anywhere (v6)             
+4506/tcp (v6)              ALLOW       Anywhere (v6)             
+7777/tcp (v6)              ALLOW       Anywhere (v6)  </code></pre>
+        </div>
+        
+        <div class="blueBox">
+        <h3 id="h7a2">Terraria pelipalvelimen lataus ja asennus</h3>
+            <h4>Manuaalisesti</h4>
+            <p>Pelipalvelin tulee peliasennuksen mukana, mutta palvelimelleni en ole asentanut peliä, joten palvelin on ladattava ulkoisesta lähteestä. Siirrytään /opt/ hakemistoon ja haetaan wgetillä.</p>
+            <p class="quote">Lainaus: /opt/ hakemisto on tarkoitettu isoille erillisille ohjelmapaketeille, joita ei haluta lisätä /usr hakemistoon. (Esim. suljettuja ohjelmia). <a href="https://www.linux.fi/wiki/Hakemistorakenne#P.C3.A4.C3.A4hakemistot_ja_niiden_sis.C3.A4ll.C3.B6t">Linux.fi-wiki</a></p>
+<pre><code>$ cd /opt
+$ sudo wget https://terraria.org/system/dedicated_servers/archives/000/000/036/original/terraria-server-1402.zip?1589675482</code></pre>
+            <p>Latauslinkistä saadaan zip-tiedosto, joten puretaan se.</p>
+<pre><code>$ sudo unzip terraria-server-1402.zip?1589675482
+$ ls 1402/
+Linux  Mac  Windows</code></pre>
+            
+            <p>Zip-tiedostossa on kansio 1402/, jonka sisällä on kansiot Linux, Mac ja Windows käyttöjärjestelmien palvelintiedostoille. Emme tarvitse Mac tai Windows tiedostoja. Siirretään Linux-kansio omaan asennuskansioonsa ja poistetaan muut tiedostot.</p>
+<pre><code>$ sudo mv /opt/1402/Linux /opt/terrariaserver-1402
+$ sudo rm -r /opt/1402/
+$ sudo rm -r /opt/terraria-server-1402.zip*</code></pre>
+            <hr>
+            <h4>SaltStackilla</h4>
+            <p>Lueskelen <a href="https://docs.saltstack.com/en/latest/ref/states/all/salt.states.archive.html">salt.states.archive</a> -dokumentaatiota ja Zip-tiedoston voisi ladata suoraan lähteestä välimuistiin ja purkaa yhdellä tilalla, mutta en näe tapaa jolla yksilöidä 1402/Linux/ hakemisto. Palvelintiedostojen pienen koon vuoksi päätän luoda kansiosta oman zip-tiedoston Salt-modulin files/ kansioon. Näin voin jättää Windows ja Mac tiedostot lataamatta ja sisällyttää myös tulevat palvelimen konfiguraatiot samaan pakettiin. Paketoidaan terrariaserver-1402.</p>
+<pre><code>$ cd /opt/
+$ sudo zip -r terrariaserverlinux1402.zip terrariaserver-1402/
+</code></pre>
+            <p>Siirretään arkisto saltin kansioihin ja luodaan tila joka purkaa sen /opt/ hakemistoon.</p>
+<pre><code>$ sudo mv /opt/terrariaserverlinux1402.zip /srv/salt/terrariaserver/files/</code></pre>
+<pre><code><span class="filepath">/srv/salt/terrariaserver/init.sls</span>
+<span class="bluetxt">### UFW rules</span>
+...
+<span class="bluetxt">### Extract Terraria-server Linux 1.4.0.2</span>
+extract_terrariaserver:
+  archive.extracted:
+    - name: /opt/
+    - source: salt://terrariaserver/files/terrariaserverlinux1402.zip
+
+</code></pre>
+            <p>Ajetaan tila paikallisesti.</p>
+<pre><code>$ sudo salt-call --local state.apply terrariaserver/
+...
+          <span class="greentxt">
+----------
+          ID: extract_terrariaserver
+    Function: archive.extracted
+        Name: /opt/
+      Result: True
+     Comment: All files in archive are already present
+     Started: 15:04:42.045163
+    Duration: 1115.114 ms
+     Changes:   
+</span>
+<span class="bluetxt">Summary for local
+------------</span>
+<span class="greentxt">Succeeded: 3</span>
+<span class="bluetxt">Failed:    0
+------------
+Total states run:     3
+Total run time:   1.147 s</span>
+</code></pre>
+            <p>Tila näyttää toimivan. Poistetaan vielä palvelintiedostot ja kokeillaan uudelleen.</p>
+<pre><code>$ sudo rm -r /opt/terrariaserver-1402/
+$ sudo salt-call --local state.apply terrariaserver/</code></pre>
+            <p>Testi toimii kuten odotettiin eikä kestäkään kuin muutaman sekunnin.</p>
+            <a href="../img/h7/h7img2.jpg" target="_blank"><img src="../img/h7/h7img2.jpg" alt="h7img2"></a><br>
+        </div>
+        
+        <div class="blueBox">
+        <h3 id="h7a3">Käyttöoikeudet ja tekninen käyttäjä</h3>
+            <h4>Manuaalisesti</h4>
+            <p>Tätyy varmistaa, että pelipalvelimen binääritiedosto on ajettavissa. Tarkastellaan palvelintiedostoja.</p>
+<pre><code>$ cd /opt/terrariaserver-1402/
+$ ls -l TerrariaServer.bin*
+-rw-r--r-- 1 root root 14310647 touko 19 15:11 TerrariaServer.bin.x86
+-rw-r--r-- 1 root root 17497051 touko 19 15:11 TerrariaServer.bin.x86_64
+</code></pre>
+            <p>Asetetaan ajo-oikeus binääreille.</p>
+<pre><code>$ sudo chown -R root:root /opt/terrariaserver-1402/
+$ sudo chmod +x /opt/terrariaserver-1402/TerrariaServer.bin*
+</code></pre>
+<pre><code>$ ls -l TerrariaServer.bin*
+-rwxr-xr-x 1 root root 14310647 touko 19 15:11 <span class="brightgreentxt">TerrariaServer.bin.x86</span>
+-rwxr-xr-x 1 root root 17497051 touko 19 15:11 <span class="brightgreentxt">TerrariaServer.bin.x86_64</span></code></pre>
+            <p>Hyvä käytäntö on luoda tekninen käyttäjä, jolla palvelinta pyöritetään. Luodaan system user (-r), jonka kotihakemisto (-m) on hakemistossa /srv/terrariaserver (-d PATH).</p>
+<pre><code>$ sudo useradd -r -m -d /srv/terrariaserver terrariaserver</code></pre>
+            <hr>
+            <h4>SaltStackilla</h4>
+            <p>Nopeasti testattuna luvat pysyvät ainakin paikallisesti arkiston sisällä kunnossa eli uudelleen zipattuna ei tarvitsisi erikseen vaihtaa oikeuksia, mutta voidaan kirjoittaa tila joka tarkastaa oikeudet kuitenkin. "0755" moodi tarkoittaa, että omistajalle (root) suodaan oikeudet lukea, kirjoittaa ja ajaa. Ryhmällä ja muilla on oikeudet vain lukea ja ajaa. Tila vaatii, että terraria-palvelimen arkisto on purettu kohdekansioon.</p>
+<pre><code><span class="filepath">/srv/salt/terrariaserver/init.sls</span>
+<span class="bluetxt">### UFW rules</span>
+...
+<span class="bluetxt">### Extract Terraria-server Linux 1.4.0.2</span>
+...
+<span class="bluetxt">### Check TerrariaServer.bin executable permissions</span>
+/opt/terrariaserver-1402/TerrariaServer.bin.x86:
+  file.managed:
+    - source: /opt/terrariaserver-1402/TerrariaServer.bin.x86
+    - mode: '0755'
+    - require:
+      - extract_terrariaserver
+
+/opt/terrariaserver-1402/TerrariaServer.bin.x86_64:
+  file.managed:
+    - source: /opt/terrariaserver-1402/TerrariaServer.bin.x86_64
+    - mode: '0755'
+    - require:
+      - extract_terrariaserver
+
+</code></pre>
+            <p>Testataan tila.</p>
+<pre><code>$ sudo salt-call --local state.apply terrariaserver/
+...
+<span class="greentxt">----------
+          ID: /opt/terrariaserver-1402/TerrariaServer.bin.x86
+    Function: file.managed
+      Result: True
+     Comment: File /opt/terrariaserver-1402/TerrariaServer.bin.x86 exists with proper permissions. No changes made.
+     Started: 16:44:49.677282
+    Duration: 2.173 ms
+     Changes:   
+----------
+          ID: /opt/terrariaserver-1402/TerrariaServer.bin.x86_64
+    Function: file.managed
+      Result: True
+     Comment: File /opt/terrariaserver-1402/TerrariaServer.bin.x86_64 exists with proper permissions. No changes made.
+     Started: 16:44:49.679686
+    Duration: 1.976 ms
+     Changes:   
+</span>
+<span class="bluetxt">Summary for local
+------------</span>
+<span class="greentxt">Succeeded: 5</span>
+<span class="bluetxt">Failed:    0
+------------
+Total states run:     5
+Total run time:   1.287 s</span>
+</code></pre>
+            <p>Seuraavaksi lisätään tila, joka luo teknisen käyttäjän. Katsotaan aiemmin luodun "terrariaserver" käyttäjän uid, jotta se on sama saltilla luodessa.</p>
+<pre><code>$ id -u terrariaserver
+998</code></pre>
+            <p>Kirjoitetaan init.sl tila.</p>
+            <ul>
+                <li><span class="command">name</span> - käyttäjän tunnus</li>
+                <li><span class="command">system</span> - luo järjestelmäkäyttäjän (sama kuin -r)</li>
+                <li><span class="command">createhome</span> - oletuksen järjestelmä käyttäjälle ei luoda kotihakemistoa, tämä muuttaa asian. (sama kuin -m)</li>
+                <li><span class="command">home</span> - kotihakemiston sijainti</li>
+                <li><span class="command">uid</span> - käyttäjä ID</li>
+            </ul>
+<pre><code><span class="filepath">/srv/salt/terrariaserver/init.sls</span>
+<span class="bluetxt">### UFW rules</span>
+...
+<span class="bluetxt">### Extract Terraria-server Linux 1.4.0.2</span>
+...
+<span class="bluetxt">### Check TerrariaServer.bin executable permissions</span>
+...
+<span class="bluetxt">### Create system user "terrariaserver"</span>
+terrariaserver-user:
+  user.present:
+    - name: terrariaserver
+    - system: True
+    - createhome: True
+    - home: /srv/terrariaserver
+    - uid: 998
+</code></pre>
+            <p>Ajetaan tila paikallisesti ja kokeillaan.</p>
+<pre><code>$ sudo salt-call --local state.apply terrariaserver/
+...
+<span class="bluetxt">Summary for local
+------------</span>
+<span class="greentxt">Succeeded: 6</span>
+<span class="bluetxt">Failed:    0
+------------
+Total states run:     6
+Total run time:   1.550 s</span>
+</code></pre>
+            <p>Käyttäjä näkyy olevan paikallaan. Poistetaan käyttäjä sekä kotihakemisto ja kokeillaan vielä uudelleen.</p>
+<pre><code>$ sudo userdel terrariaserver 
+$ sudo rm -r /srv/terrariaserver/
+$ sudo salt-call --local state.apply terrariaserver/
+...
+<span class="bluetxt">----------
+          ID: terrariaserver-user
+    Function: user.present
+        Name: terrariaserver
+      Result: True
+     Comment: New user terrariaserver created
+     Started: 17:24:04.844913
+    Duration: 72.449 ms
+     Changes:   
+              ----------
+              fullname:
+              gid:
+                  998
+              groups:
+                  - terrariaserver
+              home:
+                  /srv/terrariaserver
+              homephone:
+              name:
+                  terrariaserver
+              passwd:
+                  x
+              roomnumber:
+              shell:
+                  /bin/sh
+              uid:
+                  998
+              workphone:
+
+Summary for local
+------------</span>
+<span class="greentxt">Succeeded: 6 (changed=1)</span>
+<span class="bluetxt">Failed:    0
+------------
+Total states run:     6
+Total run time:   1.591 s</span>
+$ id terrariaserver 
+uid=998(terrariaserver) gid=998(terrariaserver) groups=998(terrariaserver)
+$ ls -ld /srv/terrariaserver/
+drwxr-xr-x 3 terrariaserver terrariaserver 4096 touko 19 17:24 <span class="deepbluetxt">/srv/terrariaserver/</span>
+</code></pre>
+            <p>Toimii.</p>
+        </div>
+        
+        <div class="blueBox">
+        <h3 id="h7a4">Konfiguraatiotiedosto</h3>
+            <p>Tällä hetkellä pelipalvelin on käytettävissä. Palvelin saadaan käynnistettyä TerrariaServer.bin.x86_64 binääristä.</p>
+            <a href="../img/h7/h7img3.jpg" target="_blank"><img src="../img/h7/h7img3.jpg" alt="h7img3"></a><br>
+            <p>Ylläolevasta kuvasta näkyy, että Terrarian palvelimella on velho, jonka avulla voidaan luoda uusi maailma, mutta palvelin voidaan myös konfiguroida käyttämään valmiiksi luotua karttaa.</p>
+            <p>Seuraavaksi tehdään kartta ja luodaan konfiguraatiotiedosto.</p>
+            <h4>Manuaalisesti</h4>
+            <p>Käydään aluksi luomassa kartta Terrariassa Windows 10-koneella, johon Terraria on asennettu.</p>
+            <a href="../img/h7/h7img4.jpg" target="_blank"><img src="../img/h7/h7img4.jpg" alt="h7img4"></a><br>
+            <p>Kartta löytyy polusta "C:\Users\%USERNAME%\Documents\my games\Terraria\Worlds\Salty_County.wld"</p>
+            <p>Siirretään kartta SCP:llä master-koneelle.</p>
+            <pre><code>pscp "C:\Users\%USERNAME%\Documents\my games\Terraria\Worlds\Salt_County.wld" krisu@192.168.1.127:Downloads
+Salt_County.wld           | 6350 kB | 6350.8 kB/s | ETA: 00:00:00 | 100%</code></pre>
+            <p>Kopioidaan tiedosto terrariaserver-käyttäjän kotihakemistoon kansioon Worlds/</p>
+<pre><code>$ sudo mkdir /srv/terrariaserver/Worlds/
+$ sudo mv ~/Downloads/Salt_County.wld /srv/terrariaserver/Worlds/
+</code></pre>
+            <p>Nyt kun sudoteltiin uusi kansio ja tiedosto terrariaserver käyttäjän kotihakemistoon, muistetaan käydä muokkaamassa omistaja ettei jää rootiksi.</p>
+            <pre><code>$ sudo chown -R terrariaserver:terrariaserver /srv/terrariaserver/Worlds/</code></pre>
+            <p>Käydään luomassa konfiguraatiotiedosto terrariaserver-1402 hakemistoon. <a href="https://terraria.gamepedia.com/Guide:Setting_up_a_Terraria_server#Making_a_configuration_file">Making a configuration file</a></p>
+<pre><code><span class="filepath">/opt/terrariaserver-1402/serverconfig.txt</span>
+<span class="bluetxt"># Server</span>
+world=/srv/terrariaserver/Worlds/Salt_County.wld
+banlist=/srv/terrariaserver/banlist.txt
+motd=Planted trees only grow up 16 tiles high. Leave taller trees alone for aesthethics.
+port=7777
+password=serverpassword
+maxplayers=16
+
+<span class="bluetxt"># Automatic world if .wld is not found</span>
+autocreate=1
+worldname=DefaultWorld
+worldpath=/srv/terrariaserver/Worlds
+difficulty=0</code></pre>
+            <p>Jotta voidaan lukea karttatiedosto terrariaserver kotihakemistosta, on käytettävä sudoa tai lisättävä käyttäjä ryhmään ja muokattava kansion oikeuksia. Käytetään nyt sudoa ja testataan että palvelin toimii.</p>
+<pre><code>$ cd /opt/terrariaserver-1402/
+$ sudo ./TerrariaServer.bin.x86_64 -config /opt/terrariaserver-1402/serverconfig.txt
+<span class="beigetxt">Error Logging Enabled.
+...
+Settling liquids 47%
+Settling liquids 48%
+Settling liquids 49%
+Settling liquids 50%
+
+Terraria Server v1.4.0.2
+
+Listening on port 7777
+Type 'help' for a list of commands.
+
+
+: Server started
+help
+Available commands:
+
+help		Displays a list of commands.
+playing		Shows the list of players.
+clear		Clear the console window.
+exit		Shutdown the server and save.
+exit-nosave	Shutdown the server without saving.
+save		Save the game world.
+kick &lt;player&gt;	Kicks a player from the server.
+ban &lt;player&gt;	Bans a player from the server.
+password	Show password.
+password &lt;pass&gt;	Change password.
+version		Print version number.
+time		Display game time.
+port		Print the listening port.
+maxplayers	Print the max number of players.
+say &lt;words&gt;	Send a message.
+motd		Print MOTD.
+motd &lt;words&gt;	Change MOTD.
+dawn		Change time to dawn.
+noon		Change time to noon.
+dusk		Change time to dusk.
+midnight	Change time to midnight.
+settle		Settle all water.
+: </span></code></pre>
+            <p>Nyt palvelin ei pyydä luomaan maailmaa, vaan tuntuu siltä että maailma ladattiin konfiguraatiosta. Yhdistetään palvelimelle Terrariassa.</p>
+            <a href="../img/h7/h7img5.jpg" target="_blank"><img src="../img/h7/h7img5.jpg" alt="h7img5"></a><br>
+            <p>Päästiin palvelimelle.</p>
+            <hr>
+            <h4>SaltStackilla</h4>
+            <p>Konfiguraatiotiedosto voidaan sisällyttää aiemmin luotuun arkistoon tai lisätä jälkikäteen file.managed -funktiolla. Tehdään kumpikin tapa ja varmistutaan siitä että tiedosto on paikallaan.</p>
+            <p>Paketoidaan palvelinkansio uudelleen ja siirretään arkisto Salt-modulin files kansioon.</p>
+<pre><code>$ cd /opt/
+$ sudo zip -r terrariaserverlinux1402.zip terrariaserver-1402/
+$ sudo mv terrariaserverlinux1402.zip /srv/salt/terrariaserver/files/</code></pre>
+            <p>Kopioidaan serverconfig.txt ja Salt_County.wld tiedostot Salt-modulin files kansioon.</p>
+<pre><code>$ sudo cp /opt/terrariaserver-1402/serverconfig.txt /srv/salt/terrariaserver/files/
+$ sudo cp /srv/terrariaserver/Worlds/Salt_County.wld /srv/salt/terrariaserver/files/</code></pre>
+            <p>Luodaan tilat konfiguraation ja World-tiedoston kopioimiseksi niille osoitettuihin hakemistoihin.</p>
+            <p class="quote">terrariaserver-hakemistoon on luotava Worlds kansio .wld -tiedostoille. Tämä hoituu asettamalla "makedirs: True" -parametri tilaan. makedirs -parametri luo yläkansion mikäli niitä ei ole. Oikeudet ja omistajuuskin on tiedoston mukaiset.
+                <br><br>.wld-tiedosto pitää sisällään maailman tallennustilanteen, joten sen tilaan on laitettava "replace: False", jotta tallennus ei aina palaudu alkuvaiheeseen. replace -parametri kirjoittaa ainoastaan tiedoston mikäli sitä ei löydy, mutta pakottaa oikeudet ja omistajan aina.
+                <br><br>Annetaan ryhmälle luku ja kirjoitusoikeudet ('0664'), jotta terrariaserver ryhmään kuuluva käyttäjä voi tallentaa maailman.
+            </p>
+<pre><code><span class="filepath">/srv/salt/terrariaserver/init.sls</span>
+<span class="bluetxt">### UFW rules</span>
+...
+<span class="bluetxt">### Extract Terraria-server Linux 1.4.0.2</span>
+...
+<span class="bluetxt">### Check TerrariaServer.bin executable permissions</span>
+...
+<span class="bluetxt">### Create system user "terrariaserver"</span>
+...
+<span class="bluetxt">### Create serverconfig.txt and world file</span>
+/opt/terrariaserver-1402/serverconfig.txt:
+  file.managed:
+    - source: salt://terrariaserver/files/serverconfig.txt
+    - mode: '0644'
+    - require:
+      - extract_terrariaserver
+      
+/srv/terrariaserver/Worlds/Salt_County.wld:
+  file.managed:
+    - source: salt://terrariaserver/files/Salt_County.wld
+    - user: terrariaserver
+    - group: terrariaserver
+    - mode: '0664'
+    - replace: False
+    - makedirs: True
+    - require:
+      - terrariaserver-user
+</code></pre>
+            <p>Ajetaan tila paikallisesti.</p>
+<pre><code>$ sudo salt-call --local state.apply terrariaserver/
+...
+<span class="bluetxt">Summary for local
+------------</span>
+<span class="greentxt">Succeeded: 8</span>
+<span class="bluetxt">Failed:    0
+------------
+Total states run:     8
+Total run time:   1.843 s</span>
+</code></pre>
+            <p>Toimii. Poistetaan terrariaserver-1402 kansio /opt/-hakemistosta ja Worlds kansio terrariaserver kotihakemistosta ja ajetaan tila uudelleen.</p>
+<pre><code>$ sudo rm -r /opt/terrariaserver-1402/
+$ sudo rm -r /srv/terrariaserver/Worlds/
+$ sudo salt-call --local state.apply terrariaserver/
+...
+<span class="greentxt">----------
+          ID: /opt/terrariaserver-1402/serverconfig.txt
+    Function: file.managed
+      Result: True
+     Comment: File /opt/terrariaserver-1402/serverconfig.txt is in the correct state
+     Started: 22:12:51.195751
+    Duration: 4.251 ms
+     Changes:   </span>
+<span class="bluetxt">----------
+          ID: /srv/terrariaserver/Worlds/Salt_County.wld
+    Function: file.managed
+      Result: True
+     Comment: File /srv/terrariaserver/Worlds/Salt_County.wld updated
+     Started: 22:12:51.200654
+    Duration: 132.652 ms
+     Changes:   
+              ----------
+              diff:
+                  New file
+              group:
+                  terrariaserver
+              mode:
+                  0664
+              user:
+                  terrariaserver
+
+Summary for local
+------------</span>
+<span class="greentxt">Succeeded: 8 (changed=2)</span>
+<span class="bluetxt">Failed:    0
+------------
+Total states run:     8
+Total run time:   2.832 s</span>
+</code></pre>
+            <p>serverconfig.txt tuli onnistuneesti arkistosta ja file.managed tarkisti että se on paikallaan. Worlds-kansio luotiin ja sinne luotiin Salt_County.wld.</p>
+            <p>Lisätään käyttäjä ryhmään "terrariaserver". Käynnistetään palvelin, tehdään maailmaan muutos, tallennetaan ja katsotaan korvaako SaltStack .wld-tiedoston.</p>
+<pre><code>$ sudo adduser $(whoami) terrariaserver
+$ cd /opt/terrariaserver-1402
+$ ./TerrariaServer.bin.x86_64 -config /opt/terrariaserver-1402/serverconfig.txt
+<span class="beigetxt">Error Logging Enabled.
+...
+Terraria Server v1.4.0.2
+
+Listening on port 7777
+Type 'help' for a list of commands.
+
+
+: Server started</span></code></pre>
+            <a href="../img/h7/h7img6.jpg" target="_blank"><img src="../img/h7/h7img6.jpg" alt="h7img6"></a><br>
+            <p>Luotiin puinen bunkkeri aloitusalueelle. Tallennetaan maailma, poistutaan ja ajetaan tila.</p>
+<pre><code>: save
+: exit
+$ sudo salt-call --local state.apply terrariaserver/
+...
+<span class="greentxt">----------
+          ID: /srv/terrariaserver/Worlds/Salt_County.wld
+    Function: file.managed
+      Result: True
+     Comment: File /srv/terrariaserver/Worlds/Salt_County.wld exists with proper permissions. No changes made.
+     Started: 22:51:20.636925
+    Duration: 1.899 ms
+     Changes:   
+</span>
+<span class="bluetxt">Summary for local
+------------</span>
+<span class="greentxt">Succeeded: 8</span>
+<span class="bluetxt">Failed:    0
+------------
+Total states run:     8
+Total run time:   1.566 s</span>
+</code></pre>
+            <p>Ei ole tehty muutoksia tallennukseen. Maailma siis säilyy sellaisena kuin se on viimeksi tallennettu vaikka tila ajettaisiin uudelleen.</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h7a5">Palvelimen pyöritys ja hallinta (tmux / systemd / terrariad)</h3>
+            <p>Tällä hetkellä pelipalvelin vaatii manuaalisen käynnistyksen ja pyörii interaktiivisessa terminaalissa. Tämä ratkaisu ei sovi etäiselle palvelimelle. Pelipalvelin on saatava pyörimään taustalla terminaali multiplekserissä ja automatisoitava käynnistys mahdollisten kaatumisien varalta systemd skriptillä.</p>
+            <h4>Manuaalisesti</h4>
+            <p>Asennetaan tmux</p>
+            <pre><code>$ sudo apt-get update && sudo apt-get install tmux</code></pre>
+            <p>Kokeillaan käynnistää palvelin tmuxissa. Linoden <a href="https://www.linode.com/docs/game-servers/host-a-terraria-server-on-your-linode/#systemd">ohjeissa</a> on käytetty tmuxin sijaan screen -ohjelmaa. Komento, jolla ohjelma saadaan pyörimään screenissä on</p>
+            <pre><code>$ screen -d -m -S terrariaserver /bin/bash -c "/opt/terrariaserver-1402/TerrariaServer.bin.x86_64 -config /opt/terraria-1402/serverconfig.txt"</code></pre>
+            <p>Käännetään sama komento tmuxille sopivaksi. <a href="https://linux.die.net/man/1/screen">man screen</a> ja <a href="https://linux.die.net/man/1/tmux">man tmux</a> auttavat.</p>
+            <ul>
+                <li><span class="command">new-session</span> - luo uuden session</li>
+                <li><span class="command">-d</span> - käynnistää kyseisen session irrotettuna (detached)</li>
+                <li><span class="command">-s</span> - on nimi sessiolle</li>
+                <li><span class="command">shell-komento</span> - määrittelee binäärin jota kutsutaan ja antaa sille parametriksi <span class="command">-config</span>, joka määrittelee konfiguraatiotiedoston sijainnin.</li>
+            </ul>
+            <pre><code>$ tmux new-session -d -s terrariaserver '/opt/terrariaserver-1402/TerrariaServer.bin.x86_64 -config /opt/terrariaserver-1402/serverconfig.txt'</code></pre>
+            <p>Luodaan uusi tiedosto systemd kansioon nimeltä "terraria.service".
+            </p>
+            <ul>
+                <li><span class="command">Description</span> - kuvaus systemd-palvelulle</li>
+                <li><span class="command">Type</span> - prosessin käynnistystyyppi. (simple, exec, forking, oneshot, dbus, notify, idle)</li>
+                <li><span class="command">User</span> - määrittelee käyttäjän prosessille</li>
+                <li><span class="command">KillMode</span> - "none" varmistaa, että palvelin ehtii tallentaa ennen sammumista.</li>
+                <li><span class="command">ExecStart</span> - Määrittelee shell-komennon, joka ajetaan prosessin käynnistämiseksi.</li>
+                <li><span class="command">ExecStop</span> - Määrittelee shell-komennon, joka ajetaan prosessin lopettamiseksi.</li>
+                <li><span class="command">WantedBy</span> - Vähän auki, mutta "multi-user.target" käynnistää prosessin automaattisesti.</li>
+            </ul>
+<pre><code><span class="filepath">/etc/systemd/system/terraria.service</span>
+[Unit]
+Description=daemon for terraria server 1.4.0.2
+
+[Service]
+Type=simple
+User=terrariaserver
+KillMode=none
+ExecStart=/usr/bin/tmux new-session -d -s terrariaserver '/opt/terrariaserver-1402/TerrariaServer.bin.x86_64 -config /opt/terrariaserver-1402/serverconfig.txt'
+ExecStop=/usr/local/bin/terrariad exit
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+            <p>terraria.service on otettava käyttöön.</p>
+<pre><code>$ sudo systemctl enable terraria.service</code></pre>
+            <p>"ExecStop" kohdassa määritellään terrariad skripti, jota ei vielä ole luotu.</p>
+            <p>Luodaan terrariad -skripti Linoden <a href="https://www.linode.com/docs/game-servers/host-a-terraria-server-on-your-linode/#create-a-script-for-basic-terraria-administration">mallin</a> mukaan, mutta muokataan tämä tmux-yhteensopivaksi</p>
+            <p>Komentojen selvittäminen onnistuu screen ja tmux manuaaleja selaamalla. Alla oleva if -lauseke ilmeisesti tutkii screen-session kansion käyttäjä-ID:tä ja vertaa sitä. En muista enää mistä, mutta stackoverflow'ta selaillessa vastaan tuli tietoa, että tämä käyttää pistoketta. Jotta voin selvittää mikä tmuxin vastaava kansio on, katsotaan mitä pistokkeita tmux käyttää. Sitä myötä selviää myös kansio, jonka user ID:tä voidaan verrata.</p>
+<pre><code>$ tmux new-session -d -s terrariaserver '/opt/terrariaserver-1402/TerrariaServer.bin.x86_64 -config /opt/terrariaserver-1402/serverconfig.txt'
+$ sudo lsof -U|grep '^tmux'
+tmux:\x20 28641           krisu    6u  unix 0xffff982735953400      0t0 514432 /tmp/tmux-1000/default type=STREAM
+</code></pre>
+            <p>Kansio on "/tmp/tmux-1000/default". Perässä oleva numero on oletettavasti uid, koska se on sama kuin käyttäjän krisu id. Korvataan se alla olevassa koodissa tähdellä. Testataan komentoa terminaalissa.</p>
+<pre><code>$ sudo su - terrariaserver -c "stat -c '%u' /tmp/tmux-*/default"
+998</code></pre>
+            <p>Saadaan käyttäjän "terrariaserver" uid, joten olettaisin toimivan.</p>
+<pre><code><span class="filepath">/usr/local/bin/terrariad</span></code>
+#!/usr/bin/env bash
+
+send="`printf \"$*\r\"`"
+attach='script /dev/null -qc "tmux attach -t terrariaserver"'
+inject="tmux send-keys -t terrariaserver help ENTER"
+
+if [ "$1" = "attach" ] ; then cmd="$attach" ; else cmd="$inject" ; fi
+
+if [ "`stat -c '%u' /tmp/tmux-*/default`" = "$UID" ]
+then
+    $cmd
+else
+    su - terrariaserver -c "$cmd"
+fi
+</pre>
+            <p>Skripti auttaa esimerkiksi liittämään tmux-sessioon.</p>
+            <pre><code>$ sudo terrariad attach</code></pre>
+            <p>Tai ajamaan palvelimen komentoja tmux-session ulkopuolelta</p>
+            <pre><code>$ sudo terrariad save</code></pre>
+            <hr>
+            <h4>SaltStackilla</h4>
+            <p>Monimutkaisin vaihe on ohi. Luotiin vain kaksi tiedostoa, jotka on saatava nyt SaltStackin kautta luotua.</p>
+            <p>Tässä hyödynnetään tmux-pakettia. Vaikka mielestäni tmux oli jo valmiiksi asennettu xubuntulle, voidaan luoda pkg.installed tila.</p>
+            <p>systemd service on myös laitettava päälle.</p>
+            <p>Kopioidaan tiedostot Salt-modulin kansioon ja kirjoitetaan tilat</p>
+            <pre><code>$ sudo cp /usr/local/bin/terrariad /srv/salt/terrariaserver/files/
+$ sudo cp /etc/systemd/system/terraria.service /srv/salt/terrariaserver/files/
+</code></pre>
+<pre><code><span class="filepath">/srv/salt/terrariaserver/init.sls</span>
+<span class="bluetxt">### UFW rules</span>
+...
+<span class="bluetxt">### Extract Terraria-server Linux 1.4.0.2</span>
+...
+<span class="bluetxt">### Check TerrariaServer.bin executable permissions</span>
+...
+<span class="bluetxt">### Create system user "terrariaserver"</span>
+...
+<span class="bluetxt">### Create serverconfig.txt and world file</span>
+...
+<span class="bluetxt">### tmux package install</span>
+tmux:
+  pkg.installed
+
+<span class="bluetxt">### "terraria.service" systemd script and "terrariad" shell script</span>
+/etc/systemd/system/terraria.service:
+  file.managed:
+    - source: salt://terrariaserver/files/terraria.service
+    - mode: '0644'
+    - require:
+      - tmux
+
+/usr/local/bin/terrariad:
+  file.managed:
+    - source: salt://terrariaserver/files/terrariad
+    - mode: '0755'
+    - require:
+      - tmux
+
+<span class="bluetxt">### terraria.service enabled and running</span>
+terraria-service-enabled:
+  service.enabled:
+    - name: terraria.service
+    - require:
+      - /etc/systemd/system/terraria.service
+      - /usr/local/bin/terrariad
+
+terraria-service-running:
+  service.running:
+    - name: terraria.service
+    - require:
+      - /etc/systemd/system/terraria.service
+      - /usr/local/bin/terrariad
+</code></pre>
+            <p>Ajetaan tila paikallisesti.</p>
+<pre><code>$ sudo salt-call --local state.apply terrariaserver
+...
+<span class="bluetxt">Summary for local
+-------------</span>
+<span class="greentxt">Succeeded: 13</span>
+<span class="greentxt">Failed:     0
+-------------
+Total states run:     13
+Total run time:    3.478 s</span>
+</code></pre>
+            <p>Tähän mennessä näyttää hyvältä. Nyt voidaan testata tilaa alusta puhtaalle minionille.</p>
+        </div>
+        
+        <div class="blueBox">
+            <h3 id="h7a6">Lopputestaus puhtaalla minionilla.</h3>
+            <p>Ajetaan moduli minionille.</p>
+<pre><code>$ sudo salt 'feather1' state.apply terrariaserver
+<span class="redtxt">feather1:
+----------
+          ID: /etc/ufw/user.rules
+    Function: file.managed
+      Result: False
+     Comment: Source file salt://terrariaserver/files/user.rules not found
+     Started: 02:55:18.891377
+    Duration: 27.255 ms
+     Changes:   
+----------
+          ID: /etc/ufw/user6.rules
+    Function: file.managed
+      Result: False
+     Comment: Source file salt://terrariaserver/files/user6.rules not found
+     Started: 02:55:18.918813
+    Duration: 7.382 ms
+     Changes:</span>
+...
+<span class="bluetxt">Summary for feather1
+-------------</span>
+<span class="greentxt">Succeeded: 11 (changed=8)</span>
+<span class="redtxt">Failed:     2</span>
+<span class="bluetxt">-------------
+Total states run:     13
+Total run time:   24.356 s</span>
+</code></pre>
+            <p>Kaikki muut tilat näyttävät menevän läpi, paitsi ufw säännöt. Väittää että puuttuu lähteestä, mutta kyllä ne siellä ovat. Ongelma taitaakin olla oikeuksissa.</p>
+<pre><code>$ ls -l /srv/salt/terrariaserver/files/user*.rules
+-rw-r----- 1 root root 1765 touko 19 02:42 /srv/salt/terrariaserver/files/user6.rules
+-rw-r----- 1 root root 1786 touko 19 02:42 /srv/salt/terrariaserver/files/user.rules</code></pre>
+            <p>Tiedostoista näyttää puuttuvan lukuoikeus muilta käyttäjiltä.</p>
+            <pre><code>$ sudo chmod o=r /srv/salt/terrariaserver/files/user*.rules
+</code></pre>
+            <p>Kokeillaan uudelleen</p>
+<pre><code>$ sudo salt 'feather1' state.apply terrariaserver
+...
+<span class="bluetxt">Summary for feather1
+-------------</span>
+<span class="greentxt">Succeeded: 13 (changed=2)</span>
+<span class="bluetxt">Failed:     0
+-------------
+Total states run:     13
+Total run time:    4.046 s</span>
+</code></pre>
+            <p>Nyt kaikki tilat on mennyt läpi.</p>
+            <p>Testaillaan palvelinta.</p>
+<pre><code>$ sudo systemctl status terraria</code></pre>
+            <a href="../img/h7/h7img7.jpg" target="_blank"><img src="../img/h7/h7img7.jpg" alt="h7img7"></a><br>
+<pre><code>$ sudo terrariad help
+$ sudo terrariad attach</code></pre>
+            <a href="../img/h7/h7img8.jpg" target="_blank"><img src="../img/h7/h7img8.jpg" alt="h7img8"></a><br>
+<pre><code>$ hostname -I
+192.168.1.128 </code></pre>
+            <a href="../img/h7/h7img9.jpg" target="_blank"><img src="../img/h7/h7img9.jpg" alt="h7img9"></a><br>
+            <a href="../img/h7/h7img10.jpg" target="_blank"><img src="../img/h7/h7img10.jpg" alt="h7img10"></a><br>
+            <h4>Johtopäätös</h4>
+            <p>Kaikesta päätellen palvelin on oikein asennettu ja Salt-moduli toimii.</p>
         </div>
         
         <div class="blueBox">
@@ -93,7 +809,16 @@
             <p>
                 <a href="http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/">http://terokarvinen.com/2020/configuration-managment-systems-palvelinten-hallinta-ict4tn022-spring-2020/</a><br>
                 <a href="https://terraria.gamepedia.com/Server">https://terraria.gamepedia.com/Server</a><br>
-                <a href="https://www.linode.com/docs/game-servers/host-a-terraria-server-on-your-linode/">https://www.linode.com/docs/game-servers/host-a-terraria-server-on-your-linode/</a>      
+                <a href="https://terraria.gamepedia.com/Guide:Setting_up_a_Terraria_server">https://terraria.gamepedia.com/Guide:Setting_up_a_Terraria_server</a><br>
+                <a href="https://www.linode.com/docs/game-servers/host-a-terraria-server-on-your-linode/">https://www.linode.com/docs/game-servers/host-a-terraria-server-on-your-linode/</a><br>
+                <a href="https://docs.saltstack.com/en/latest/ref/states/all/salt.states.file.html">https://docs.saltstack.com/en/latest/ref/states/all/salt.states.file.html</a><br>
+                <a href="https://www.linux.fi/wiki/Hakemistorakenne">https://www.linux.fi/wiki/Hakemistorakenne</a><br>
+                <a href="https://docs.saltstack.com/en/latest/ref/states/all/salt.states.archive.html">https://docs.saltstack.com/en/latest/ref/states/all/salt.states.archive.html</a><br>
+                <a href="https://linux.die.net/man/1/screen">https://linux.die.net/man/1/screen</a><br>
+                <a href="https://linux.die.net/man/1/tmux">https://linux.die.net/man/1/tmux</a><br>
+                
+                
+                
             </p>
         </div>
     </div>

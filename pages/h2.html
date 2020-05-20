@@ -90,9 +90,9 @@
             <h3 id="h2a1">Apachen asennus</h3>
             
             <p>Navigoidaan master-koneen <span class="command">/srv/salt</span> -kansioon</p>
-            <pre class="code"><code>$ cd /srv/salt</code></pre>
+            <pre><code>$ cd /srv/salt</code></pre>
             <p><a href="h1.html">Edellisen viikon</a> tehtävien jäljiltä kansio näyttää tältä.</p>
-<pre class="code"><code>$ tree
+<pre><code>$ tree
 .
 ├── hellosalt.txt
 ├── hello.sls
@@ -102,9 +102,9 @@
 0 directories, 4 files
 </code></pre>
             <p>Poistetaan turhat hello world tiedostot.</p>
-            <pre class="code"><code>$ sudo rm hello*</code></pre>
+            <pre><code>$ sudo rm hello*</code></pre>
             <p>Tehdään uusi kansio <span class="command">installs/</span> paketinasennus tilojen tiedostolle <span class="command">installs.sls</span>. Nimetään kyseinen tiedosto uudelleen <span class="command">init.sls</span> ja siirretään luotuun kansioon.</p>
-<pre class="code"><code>$ sudo mkdir installs
+<pre><code>$ sudo mkdir installs
 $ sudo mv installs.sls installs/init.sls
 $ tree
 .
@@ -114,16 +114,16 @@ $ tree
 
 1 directory, 2 files</code></pre>
             <p>Muokataan <span class="command">installs/init.sls</span> tiedostoa siten että se asentaa apache2:n</p>
-<pre class="code"><code>$ sudoedit installs/init.sls</code></pre>
-<pre class="code"><code>apache2:
+<pre><code>$ sudoedit installs/init.sls</code></pre>
+<pre><code>apache2:
   pkg.installed</code></pre>
             <p>Tarkastetaan <span class="command">top.sls</span> tiedosto kuntoon.</p>
-<pre class="code"><code>$ sudoedit top.sls</code></pre>
-<pre class="code"><code>base:
+<pre><code>$ sudoedit top.sls</code></pre>
+<pre><code>base:
   'wings':
     - installs</code></pre>
             <p>Pusketaan tila orjalle.</p>
-<pre class="code"><code>$ sudo salt 'wings' state.highstate
+<pre><code>$ sudo salt 'wings' state.highstate
 ...
 Summary for wings
 ------------
@@ -133,7 +133,7 @@ Failed:    0
 Total states run:     1
 Total run time:  35.254 s</code></pre>
             <p>Katsotaan että apache toimii.</p>
-<pre class="code"><code>$ curl localhost|grep '&lt;title&gt;'
+<pre><code>$ curl localhost|grep '&lt;title&gt;'
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
     &lt;title&gt;Apache2 Ubuntu Default Page: It works&lt;/title&gt;
@@ -146,23 +146,23 @@ Total run time:  35.254 s</code></pre>
             <h3 id="h2a2">Apachen oletussivun muokkaaminen</h3>
             
             <p>Luodaan <span class="command">/srv/salt</span> -kansioon uusi kansio <span class="command">configs</span> ja sinne uusi <span class="command">init.sls</span> tiedosto. Tiedostossa käytetään file-tilan .managed funktiota, joka tarkastaa tiedoston olemassaolon, sisällön ja päivittää tarvittaessa.</p>
-<pre class="code"><code>$ sudo mkdir configs
+<pre><code>$ sudo mkdir configs
 $ sudoedit apacheconfigs/init.sls</code></pre>
-            <pre class="code"><code>index.html:
+            <pre><code>index.html:
   file.managed:
     - name: /var/www/html/index.html
     - source: salt://apacheconf/defaultpage.html</code></pre>
             <p>Luodaan oletusivun html tiedoston template.</p>
-<pre class="code"><code>$ sudoedit apacheconf/defaultpage.html</code></pre>
-<pre class="code"><code>Hello, Apache t: SaltStack</code></pre>
+<pre><code>$ sudoedit apacheconf/defaultpage.html</code></pre>
+<pre><code>Hello, Apache t: SaltStack</code></pre>
             <p>Lisätään <span class="command">top.sls</span> -tiedostoonn apacheconf viittaus</p>
-<pre class="code"><code>$ sudoedit top.sls</code></pre>
-<pre class="code"><code>base:
+<pre><code>$ sudoedit top.sls</code></pre>
+<pre><code>base:
   'wings':
     - installs
     - apacheconf</code></pre>
             <p>Pusketaan tila orjalle.</p>
-            <pre class="code"><code>$ sudo salt 'wings' state.highstate
+            <pre><code>$ sudo salt 'wings' state.highstate
 ...
 Summary for local
 ------------
@@ -173,7 +173,7 @@ Total states run:     2
 Total run time:   1.513 s
 </code></pre>
             <p>Katsotaan lopputulos.</p>
-            <pre class="code"><code>$ curl localhost
+            <pre><code>$ curl localhost
 Hello, Apache t: SaltStack</code></pre>
             <p>Hyvin toimii.</p>
             
@@ -181,10 +181,10 @@ Hello, Apache t: SaltStack</code></pre>
             <h3 id="h2a3">Apachen konfiguraatio (manuaalisesti)</h3>
             <p>Luon VirtualHostin tesmitys.example.com osoitteelle, joka ohjaa käyttäjän kotihakemistossa sijaitsevaan tesmitys.example.com kansioon.</p>
             <p>Tehdään ensin käsin, jotta voidaan olla varmoja sen toimivuudesta. Navigoidaan oikeaan kansioon työskentelyä varten.</p>
-<pre class="code"><code>$ cd /etc/apache2/sites-available/</code></pre>
+<pre><code>$ cd /etc/apache2/sites-available/</code></pre>
             <p>Luodaan konfiguraatio-tiedosto.</p>
-<pre class="code"><code>$ sudoedit tesmitys.example.com</code></pre>
-<pre class="code"><code>&lt;VirtualHost *:80&gt;
+<pre><code>$ sudoedit tesmitys.example.com</code></pre>
+<pre><code>&lt;VirtualHost *:80&gt;
         ServerName tesmitys.example.com
         ServerAlias www.tesmitys.example.com
         DocumentRoot /home/krisu/tesmitys.example.com
@@ -194,29 +194,29 @@ Hello, Apache t: SaltStack</code></pre>
         &lt;/Directory&gt;
 &lt;/VirtualHost&gt;</code></pre>
             <p>Otetaan uusi konfiguraatio käyttöön ja oletus pois käytöstä, sekä tarkastetaan syntax.</p>
-            <pre class="code"><code>$ sudo a2ensite tesmitys.example.com.conf
+            <pre><code>$ sudo a2ensite tesmitys.example.com.conf
 $ sudo a2dissite 000-default.conf
 $ apache2ctl configtest
 ...
 Syntax OK</code></pre>
             <p>Tässä vaiheessa on hyvä tarkastella mitä Apache tekee kun se ajaa a2dissite ja a2ensite komennot. Myöhemmin SaltStackin tilojen luonnissa tulee hyödyksi. Luennolta on jäänyt muistiinpanoihin tapa tarkastella viimeksi muokattuja tiedostoja. Tulostetaan findin tuloksiin /etc/ ja $HOME kansioista ajankohta (%T), polku (%p) ja rivinvaihto (\n), sekä laitetaan järjestykseen.</p>
-<pre class="code"><code>$ find /etc/ $HOME -printf '%T+ %p\n'|sort
+<pre><code>$ find /etc/ $HOME -printf '%T+ %p\n'|sort
 2020-04-14+19:12:57.5548472680 /etc/apache2/sites-available/tesmitys.example.com.conf
 2020-04-14+19:13:06.8868469410 /etc/apache2/sites-enabled/tesmitys.example.com.conf
 2020-04-14+19:13:15.1388466520 /etc/apache2/sites-enabled</code></pre>
             <p>Komento näyttää vain siirtävän tiedostot <span class="command">sites-available</span> kansiosta <span class="command">sites-enabled</span> kansioon. Tämän jälkeen Apache2 täytyy käyninstää uudelleen.</p>
-            <pre class="code"><code>$ sudo systemctl restart apache2</code></pre>
+            <pre><code>$ sudo systemctl restart apache2</code></pre>
             <p>Käydään luomassa kotihakemistoon kansio ja <span class="command">index.html</span> johon viitataan.</p>
-<pre class="code"><code>$ mkdir tesmitys.example.com
+<pre><code>$ mkdir tesmitys.example.com
 $ nano tesmitys.example.com/index.html</code></pre>
-<pre class="code"><code>Hello, VirtualHost</code></pre>
+<pre><code>Hello, VirtualHost</code></pre>
             <p>Testataan.</p>
-<pre class="code"><code>$ curl localhost
+<pre><code>$ curl localhost
 Hello, VirtualHost</code></pre>
             <div class="taskerror"><p>Luotiin siis kansio käyttäjän kotihakemistoon. Mieleen juolahtaa ongelma. Mistä tiedetään että orjalla on kyseinen käyttäjä jonka kotihakemistoon ollaan luomassa kansiota?</p>
             <p>Käyttäjien käsitteleminen SaltStackilla vaikuttaa laajemmalta aiheelta joka varmaan tullaan käsittelemään myöhemmillä luennoilla ja niiden harjoituksissa, joten jätän tässä vaiheessa väliin. Käynkin muuttamassa <span class="command">tesmitys.example.com</span>in hakemiston <span class="command">/var/www/</span> -hakemistoon, joka löytyy Xubuntu slave-koneelta Apachen asennuksen jälkeen.</p>
-<pre class="code"><code>$ sudoedit tesmitys.example.com</code></pre>
-<pre class="code"><code>&lt;VirtualHost *:80&gt;
+<pre><code>$ sudoedit tesmitys.example.com</code></pre>
+<pre><code>&lt;VirtualHost *:80&gt;
         ServerName tesmitys.example.com
         ServerAlias www.tesmitys.example.com
         DocumentRoot /var/www/tesmitys.example.com
@@ -225,7 +225,7 @@ Hello, VirtualHost</code></pre>
                 Require all granted
         &lt;/Directory&gt;
 &lt;/VirtualHost&gt;</code></pre>
-<pre class="code"><code>$ sudo mv /home/krisu/tesmitys.example.com /var/www
+<pre><code>$ sudo mv /home/krisu/tesmitys.example.com /var/www
 $ sudo systemctl restart apache2
 $ curl localhost
 Hello, VirtualHost</code></pre><br>
@@ -235,7 +235,7 @@ Hello, VirtualHost</code></pre><br>
             <hr>
             <h3 id="h2a4">Apachen konfiguraatio (SaltStackilla)</h3>
             <p>Luodaan <span class="command">/srv/salt/apacheconf/</span> kansioon uusi <span class="command">templates</span> kansio. Kopioidaan tesmitys.example.com.conf ja siirretään sinne myös aiemmin luotu <span class="command">defaultpage.html</span> asioiden organisoimiseksi.</p>
-<pre class="code"><code>$ cd /srv/salt/apacheconf/
+<pre><code>$ cd /srv/salt/apacheconf/
 $ sudo mkdir templates
 $ sudo cp /etc/apache2/sites-available/tesmitys.example.com.conf templates/
 $ sudo mv ./defaultpage.html templates/
@@ -250,8 +250,8 @@ $ tree
 krisu@wings:/srv/salt/apacheconf$ </code></pre>
             <p>Päivitellään <span class="command">init.sls</span> tiedostoa, niin että se luo konfiguraatio-tiedostot Apache2:n <span class="command">sites-available/</span> ja myös <span class="command">sites-enabled/</span> kansioon.</p>
             <div class="taskerror"><b>Virhe!</b>
-<pre class="code"><code>$ sudoedit init.sls</code></pre>
-<pre class="code"><code>index.html:
+<pre><code>$ sudoedit init.sls</code></pre>
+<pre><code>index.html:
   file.managed:
     - name: /var/www/html/index.html
     - source: salt://apacheconf/templates/defaultpage.html
@@ -266,7 +266,7 @@ tesmitys.example.com.conf.enabled:
     - name: /etc/apache2/sites-enabled/tesmitys.example.com.conf
     - source: salt://apacheconf/templates/tesmitys.example.com.conf</code></pre>
                 <p>Pusketaan tila orjalle.</p>
-<pre class="code"><code>$ sudo salt 'wings' state.highstate
+<pre><code>$ sudo salt 'wings' state.highstate
 <span style="color:salmon">wings:
     Data failed to compile:
 ----------
@@ -280,8 +280,8 @@ tesmitys.example.com.conf.enabled:
 ...</code></pre>
                 <p>Kaksoispiste puuttuu riviltä 7, käydään korjaamassa.</p>
             </div>
-<pre class="code"><code>$ sudoedit init.sls</code></pre>
-<pre class="code"><code>index.html:
+<pre><code>$ sudoedit init.sls</code></pre>
+<pre><code>index.html:
   file.managed:
     - name: /var/www/html/index.html
     - source: salt://apacheconf/templates/defaultpage.html
@@ -296,7 +296,7 @@ tesmitys.example.com.conf.enabled:
     - name: /etc/apache2/sites-enabled/tesmitys.example.com.conf
     - source: salt://apacheconf/templates/tesmitys.example.com.conf</code></pre>
             <p>Pusketaan tila orjalle.</p>
-<pre class="code"><code>$ sudo salt 'wings' state.highstate
+<pre><code>$ sudo salt 'wings' state.highstate
 ...
 Summary for wings
 ------------
@@ -307,15 +307,15 @@ Total states run:     4
 Total run time:   1.814 s</code></pre>
             <p>Seuraavaksi on saatava <span class="command">000-default.conf</span> pois käytöstä, eli pois <span class="command">sites-enabled/</span> kansiosta. Tässä menee hetki selvittää, miten tämä onnistuu.</p>
             <p>Asia ei loppujen lopuksi olekaan hankala. Se hoituu .managed funktion sijaan .absent funktiolla. Käydään muokkaamassa <span class="command">init.sls</span> tiedostoa ja lisätään sen loppuun.</p>
-<pre class="code"><code>$ sudoedit init.sls</code></pre>
-<pre class="code"><code>...
+<pre><code>$ sudoedit init.sls</code></pre>
+<pre><code>...
 
 000-default.conf:
   file.absent:
     - name: /etc/apache2/sites-enabled/000-default.conf
 </code></pre>
             <p>Testaan ja saan yhden successin tulosteeseen lisää. Laitetaan <span class="command">000-default.conf</span> -tiedosto vielä päälle, että nähdään poistuuko tiedosto varmasti.</p>
-            <pre class="code"><code>$ sudo a2ensite 000-default.conf
+            <pre><code>$ sudo a2ensite 000-default.conf
 $ sudo salt 'wings' state.highstate
 
 ...
@@ -344,9 +344,9 @@ Total run time:   1.795 s</code></pre>
             <h3 id="h2a5">Apache2 uudelleen käynnistys</h3>
             <p>Jotta muutokset apachella tulisivat käyttöön, on se käynnistettävä uudelleen. Ei kuitenkaan haluta että palvelin sammuilee itsekseen, joten on tarkastettava onko muutoksia tehty.</p>
             <p>Aloitetaan tutun <span class="command">init.sls</span>:n muokkaamisesta. Lisätään loppuun Apache2 servicen uudelleenkäynnistykselle ehto, joka tarkkailee oleellisia tietoja. Karvisen sivuilta löytyi <a href="http://terokarvinen.com/2018/apache-user-homepages-automatically-salt-package-file-service-example">ohjeita</a>, jotka olivat hyödyksi. Funktiot, joita käytetään ovat <span class="command">service.running</span> ja <span class="command">watch</span></p>
-<pre class="code"><code>$ cd /srv/salt/apacheconf/
+<pre><code>$ cd /srv/salt/apacheconf/
 $ sudoedit init.sls</code></pre>
-<pre class="code"><code>index.html:
+<pre><code>index.html:
   file.managed:
     - name: /var/www/html/index.html
     - source: salt://apacheconf/templates/defaultpage.html
@@ -372,7 +372,7 @@ apache2service:
       - file: /etc/apache2/sites-enabled/000-default.conf
       - file: /etc/apache2/sites-enabled/tesmitys.example.com.conf</code></pre>
             <p>Pieni testaus osoittaa, että kaikki on kunnossa. Tuloste sanoo "Service is already running". Otetaan vielä manuaalisesti <span class="command">tesmitys.example.com.conf</span> pois käytöstä, että voidaan testata käynnistyykö Apache uudelleen.</p>
-<pre class="code"><code>$ sudo a2dissite tesmitys.example.com.conf
+<pre><code>$ sudo a2dissite tesmitys.example.com.conf
 $ sudo salt 'wings' state.highstate^C
 ...
           ID: apache2service
@@ -399,7 +399,7 @@ Total run time:   1.939 s</code></pre>
             <hr>
             <h3 id="h2a6">Hakemiston ja tiedoston luonti</h3>
             <p>Luodaan tätä varten erillinen tila uuteen kansioon ja tiedostoon, sillä edellinen on nimetty "apacheconf".</p>
-<pre class="code"><code>$ cd /srv/salt/
+<pre><code>$ cd /srv/salt/
 $ sudo mkdir tesmitysdir
 $ sudoedit tesmitysdir/init.sls
 </code></pre>
@@ -414,7 +414,7 @@ $ sudoedit tesmitysdir/init.sls
                 </ul>
                 <p>Jos halutaan useampia oikeuksia lasketaan oikeuksien numerot yhteen. Esim. luku ja kirjoitusoikeus on 6 (4+2) ja kaikki oikeudet 7 (4+2+1) <br><br><i>(Lisätty 16.04.2020)</i></p>
             </div>
-<pre class="code"><code>/var/www/tesmitys.example.com:
+<pre><code>/var/www/tesmitys.example.com:
   file.directory:
     - user: krisu
     - group: krisu
@@ -428,10 +428,10 @@ $ sudoedit tesmitysdir/init.sls
   file.managed:
     - source: salt://tesmitysdir/templates/indexpage.html</code></pre>
             <p>Lisätään vielä HTML-sivu sille varattuun <span class="command">templates</span> kansioon.</p>
-<pre class="code"><code>$ sudo mkdir /srv/salt/tesmitysdir/templates
+<pre><code>$ sudo mkdir /srv/salt/tesmitysdir/templates
 $ sudo nano /srv/salt/tesmitysdir/templates/indexpage.html</code></pre>
             <p>Kokeillaan</p>
-<pre class="code"><code>$ sudo salt 'wings' state.apply tesmitysdir
+<pre><code>$ sudo salt 'wings' state.apply tesmitysdir
 wings:
 ----------
           ID: /var/www/tesmitys.example.com
@@ -468,13 +468,13 @@ Failed:    0
 Total states run:     2
 Total run time:  32.787 ms</code></pre>
             <p>Katsotaan menikö kansion luvat oikein.</p>
-<pre class="code"><code>$ ls -l /var/www/tesmitys.example.com/
+<pre><code>$ ls -l /var/www/tesmitys.example.com/
 total 4
 -rwxrwxr-x 1 krisu krisu 29 huhti 15 00:50 index.html
 $ ls -l /var/www/tesmitys.example.com/index.html 
 -rwxrwxr-x 1 krisu krisu 29 huhti 15 00:50 /var/www/tesmitys.example.com/index.html</code></pre>
             <p>Näyttää menneen. Käydään laittamassa <span class="command">top.sls</span> vielä kuntoon.</p>
-            <pre class="code"><code>$ sudoedit /srv/salt/top.sls 
+            <pre><code>$ sudoedit /srv/salt/top.sls 
 $ cat /srv/salt/top.sls 
 base:
   '*':
@@ -487,7 +487,7 @@ base:
             <h3 id="h2a7">Lopputestaus</h3>
             <p>Nyt kun kaikki on tähän mennyssä tehty Apachen suhteen ja kaikki toimii master-koneella, kokeillaan erillisellä minionilla joka luotiin harjoituksen alussa.</p>
             <p>Ladataan salt-minion uudelle koneelle, muokataan konfiguraatiota ja käynnistetään salt-minion uudelleen, jotta se saa yhteyden masteriin.</p>
-<pre class="code"><code>$ sudo apt-get update
+<pre><code>$ sudo apt-get update
 $ sudo apt-get install salt-minion -y
 ...
 $ sudoedit /etc/salt/minion
@@ -497,13 +497,13 @@ id: feather1
 $ sudo systemctl restart salt-minion.service</code></pre>
             <div class="taskerror"><b>Virhe!</b>
                 <p>Hyväksytään masterilla uusi avain.</p>
-<pre class="code"><code>$ sudo salt-key -A
+<pre><code>$ sudo salt-key -A
 The key glob '*' does not match any unaccepted keys.</code></pre>
                 <p>Ei tietenkään toimi, sillä virtuaalikoneet eivät näe toisiaan. Verkkoa ei ole asetettu oikein. Mennään VirtualBoxista asettamaan kummatkin koneet yhteiseen verkkoon ja käynnistetään ne uudelleen. <a href="https://study.com/academy/lesson/how-to-network-virtual-machines-in-virtualbox.html">How to Network Virtual Machines in VirtualBox</a></p>
                 <a href="../img/h2/h2img1.jpg" target="_blank"><img src="../img/h2/h2img1.jpg" alt="h2img1"></a><br>
                 <p class="quote">Näkyvyyden ei tarvitse olla kaksisuuntainen. Ainoastaan masterin on oltava näkyvissä minionille. <i>(Lisätty 16.04.2020)</i></p>
                 <p>Kun koneet on käynnistetty uudelleen, on muutettava masterin hostname kummallakin koneella, koska se on nyt muuttunut.</p>
-<pre class="code"><code>$ hostname -I
+<pre><code>$ hostname -I
 192.168.1.132
 $ sudoedit /etc/salt/minion
 $ cat /etc/salt/minion
@@ -513,14 +513,14 @@ $ sudo systemctl restart salt-minion.service
 </code></pre>
                 </div>
             <p>Hyväksytään masterilla uudet avaimet.</p>
-<pre class="code"><code>$ sudo salt-key -A
+<pre><code>$ sudo salt-key -A
 Unaccepted Keys:
 feather1
 Proceed? [n/Y] y
 Key for minion feather1 accepted.</code></pre>
             <p>Pusketaan tilat minionille.</p>
             
-<pre class="code"><code>$ sudo salt 'feather1' state.highstate</code></pre>
+<pre><code>$ sudo salt 'feather1' state.highstate</code></pre>
             <a href="../img/h2/h2img2.jpg" target="_blank"><img src="../img/h2/h2img2.jpg" alt="h2img2"></a><br>
             <p>Kaikki käskyt näyttää menneen perille. Voidaan vielä tehdä yksinkertainen testi itse minionilla.</p>
             <a href="../img/h2/h2img3.jpg" target="_blank"><img src="../img/h2/h2img3.jpg" alt="h2img3"></a><br>
@@ -532,7 +532,7 @@ Key for minion feather1 accepted.</code></pre>
             <p class="assignment">Aja jokin tila paikallisesti ilman master-slave arkkitehtuuria. Tutki debug-tulostetta. 'sudo salt-call --local state.apply hellotero --state-output terse'</p>
             <h3>Komento</h3>
             <p>Lisään paketinasennus tilaan pari ylimääräistä sovellusta ja ajan sen paikallisesti.</p>
-<pre class="code"><code>$ sudoedit /srv/salt/installs/init.sls
+<pre><code>$ sudoedit /srv/salt/installs/init.sls
 $ cat /srv/salt/installs/init.sls
 apache2:
   pkg.installed

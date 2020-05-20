@@ -106,7 +106,7 @@
             
             <p>Jotta VirtualBoxin käyttö olisi mukavampaa, eli ikkunan koko on responsiivinen ja tiedon siirto isäntäkoneen ja virtuaalikoneen välillä on helpompaa, on käytettävä Guest Additionsia. Valitaan VirtualBoxin ylävalikosta "Devices" ja Guest Additions CD image</p>
             <p>Avataan terminaali ja asennetaan tarvittavat lisäosat.</p>
-<pre class="code"><code>$ sudo apt-get update
+<pre><code>$ sudo apt-get update
 $ sudo apt-get -y install linux-headers-$(uname -r) build-essential dkms virtualbox-guest-dkms
 ...
 $ cd /media/krisu/VBox_GAs_6.1.4/
@@ -115,7 +115,7 @@ $ sudo ./VBoxLinuxAdditions.run</code></pre>
             <p>Copy-paste ei vieläkään toimi. Vietän aikaa hakukoneen parissa.</p>
             <div class="taskerror"><b>Huom!</b><p>Löysin <a href="https://forums.virtualbox.org/viewtopic.php?f=6&t=97052">keskustelulangan</a> VirtualBoxin foorumeilta. Täältä ilmenee, että VBox Guest Additions 6.1.4 päivitys on rikkonut copy-paste toiminnon.</p>
             <p>Kyseisestä langasta löytyy myös nopeat ohjeet vanhemman version asentamiseen.</p>
-<pre class="code"><code>$ sudo apt-get remove -y virtualbox-guest-x11
+<pre><code>$ sudo apt-get remove -y virtualbox-guest-x11
 $ sudo apt-get remove -y virtualbox-guest-dkms
 $ sudo apt-get remove -y virtualbox-guest-utils
 $ reboot
@@ -134,40 +134,40 @@ $ reboot</code></pre>
             <p>Seuraavassa vaiheessa käytän apuna Tero Karvisen <a href="http://terokarvinen.com/2018/salt-quickstart-salt-stack-master-and-slave-on-ubuntu-linux">Salt Quickstart</a> -ohjeita.</p>
             <h4>Asennus</h4>
             <p>Päivitetään paketinhallinta ja asennetaan Saltin master-paketti.</p>
-<pre class="code"><code>$ sudo apt-get update
+<pre><code>$ sudo apt-get update
 $ sudo apt-get install salt-master -y</code></pre>
             <p>Ei välttämätöntä, mutta harjoituksen vuoksi käynnistetään palomuuri ja tehdään Saltin käyttämille porteille tarvittavat reiät.</p>
-<pre class="code"><code>$ sudo ufw allow 4505/tcp
+<pre><code>$ sudo ufw allow 4505/tcp
 $ sudo ufw allow 4506/tcp
 $ sudo ufw enable</code></pre>
             <p>Asennetaan myös slave-paketti (aka 'minion').</p>
-<pre class="code"><code>$ sudo apt-get install salt-minion -y</code></pre>
+<pre><code>$ sudo apt-get install salt-minion -y</code></pre>
             <p>Katsotaan valmiiksi koneen sisäinen IP-osoite ja käydään muokkaamassa minion-tiedostoa.</p>
-<pre class="code"><code>$ hostname -I
+<pre><code>$ hostname -I
 10.0.2.15
 $ sudoedit /etc/salt/minion</code></pre>
             <p>Tarvittava tieto on masterin sijainti. Slave käyttää oletuksena koneen hostnamea id:nä, mutta jokaisella slave-koneella on oltava yksilöllinen nimi, joten se on myös hyvä määritellä. Lisätään tiedoston alkuun.</p>
             <div class="taskerror">
                 <b>Virhe</b>
-<pre class="code"><code>master: 10.0.0.15
+<pre><code>master: 10.0.0.15
 id: wings</code></pre>
                 <p>Tallennetaan ja käynnistetään minion uudelleen.</p>
-<pre class="code"><code>$ sudo systemctl restart salt-minon.service</code></pre>
+<pre><code>$ sudo systemctl restart salt-minon.service</code></pre>
                 <p>Nyt masterin on hyväksyttävä slave-avain.</p>
-<pre class="code"><code>$ sudo salt-key -A
+<pre><code>$ sudo salt-key -A
 The key glob '*' does not match any unaccepted keys.</code></pre>
                 <p>Tuli virhe. Tarkastellaan lokista mitä kävi.</p>
-<pre class="code"><code>$ tail -20 /var/log/syslog
+<pre><code>$ tail -20 /var/log/syslog
 ...
 Apr  8 00:18:07 wings salt-minion[7324]: [ERROR   ] Error while bringing up minion for multi-master. Is master at 10.0.0.15 responding?
 ...</code></pre>
                 <p>Tästä huomaan, että hostname on kirjoitettu väärin.</p>
-<pre class="code"><code></code>$ sudoedit /etc/salt/minion</pre>
+<pre><code></code>$ sudoedit /etc/salt/minion</pre>
             </div>
-<pre class="code"><code>master: 10.0.<span style="color:yellow">2</span>.15
+<pre><code>master: 10.0.<span style="color:yellow">2</span>.15
 id: wings</code></pre>
             <p>Eli siis, nyt masterin on hyväksyttävä slave-avain.</p>
-<pre class="code"><code>$ sudo systemctl restart salt-minion.service
+<pre><code>$ sudo systemctl restart salt-minion.service
 $ sudo salt-key -A
 The following keys are going to be accepted:
 <span style="color:pink">Unaccepted Keys:</span>
@@ -176,7 +176,7 @@ Proceed? [n/Y] Y
 Key for minion wings accepted.</code></pre>
             <h4>Kokeilu</h4>
             <p>Testataan tässä vaiheessa eri komennoilla.</p>
-<pre class="code"><code>$ sudo salt '*' cmd.run 'whoami'
+<pre><code>$ sudo salt '*' cmd.run 'whoami'
 wings:
     root
 $ sudo salt '*' cmd.run 'hostname -I'
@@ -213,21 +213,21 @@ $ tree
             <p>Käytän tämän harjoituksen apuna Tero Karvisen <a href="http://terokarvinen.com/2018/salt-states-i-want-my-computers-like-this">Salt states</a> -ohjeita.</p>
             <h4>Tilan luonti</h4>
             <p>Saltin master-konfiguraatiossa <span class="command">/srv/salt/master</span> määritelty palvelin kansio on <span class="command">/srv/salt/</span>. Luodaan ja siirrytään kyseiseen kansioon.</p>
-<pre class="code"><code>$ sudo mkdir -p /srv/salt/
+<pre><code>$ sudo mkdir -p /srv/salt/
 $ cd /srv/salt/</code></pre>
             <p>Luodaan tila-tiedosto (state).</p>
-<pre class="code"><code>$ sudoedit /srv/salt/hello.sls</code></pre>
-<pre class="code"><code>/tmp/hellosalt.txt:
+<pre><code>$ sudoedit /srv/salt/hello.sls</code></pre>
+<pre><code>/tmp/hellosalt.txt:
   file.managed:
     - source: salt://hellosalt.txt</code></pre>
             <p>"salt://" siis viittaa äsken luotuun <span class="command">/srv/salt/</span> -kansioon, joten luodaan hellosalt -tekstitiedosto samaan kansioon.</p>
-<pre class="code"><code>$ sudoedit /srv/salt/hellosalt.txt</code></pre>
-<pre class="code"><code>Hello Salt! t: master</code></pre>
+<pre><code>$ sudoedit /srv/salt/hellosalt.txt</code></pre>
+<pre><code>Hello Salt! t: master</code></pre>
             <h4>Tilan levitys</h4>
             <p>Tila voidaan levittää komennolla</p>
-<pre class="code"><code>$ sudo salt '*' state.apply hello</code></pre>
+<pre><code>$ sudo salt '*' state.apply hello</code></pre>
             <p>Jossa '*' on kohde, johon se levitetään id:n perusteella. Tähti (*) merkitsee kaikkia koneita. Tehdään tämä ja testataan.</p>
-<pre class="code"><code>$ sudo salt '*' state.apply hello
+<pre><code>$ sudo salt '*' state.apply hello
 wings:
 ----------
           ID: /tmp/hellosalt.txt
@@ -250,18 +250,18 @@ Failed:    0
 ------------
 Total states run:     1
 Total run time:  36.376 ms</code></pre>
-<pre class="code"><code>$ cat /tmp/hellosalt.txt 
+<pre><code>$ cat /tmp/hellosalt.txt 
 Hello Salt! t: master</code></pre>
             <p>Vaihtoehtoinen ja parempi tapa on luoda top.sls -tiedosto, joka levittää valitut tilat kaikkiin tai yksittäisiin slave-koneisiin automaattisesti. Muokataan hellosalt -tekstitiedostoa.</p>
-<pre class="code"><code>$ sudoedit /srv/salt/hellosalt.txt</code></pre>
-<pre class="code"><code>Hello again, Salt! t: master</code></pre>
+<pre><code>$ sudoedit /srv/salt/hellosalt.txt</code></pre>
+<pre><code>Hello again, Salt! t: master</code></pre>
             <p>Kokeillaan.</p>
-<pre class="code"><code>$ sudoedit /srv/salt/top.sls</code></pre>
-<pre class="code"><code>base:
+<pre><code>$ sudoedit /srv/salt/top.sls</code></pre>
+<pre><code>base:
   '*':
     - hello</code></pre>
             <p>top.sls -tiedosto levittäytyy siis automaattisesti, mutta odotuksen säästämiseksi se voidaan levittää samantien komenolla</p>
-<pre class="code"><code>$ sudo salt '*' state.highstate
+<pre><code>$ sudo salt '*' state.highstate
 wings:
 ----------
           ID: /tmp/hellosalt.txt
@@ -286,7 +286,7 @@ Failed:    0
 ------------
 Total states run:     1
 Total run time:  67.446 ms</code></pre>
-<pre class="code"><code>$ cat /tmp/hellosalt.txt
+<pre><code>$ cat /tmp/hellosalt.txt
 Hello again, Salt! t: master
 </code></pre>
             <h4>Lopputulos</h4>
@@ -298,7 +298,7 @@ Hello again, Salt! t: master
             <p class="assignment">Kerää tietoa koneesta saltin avulla (grains.items)</p>
             <p>"Grains" on rajapinta (interface), jolla voidaan hakea tietoa käyttöjärjestelmästä, domainista, IP-osoitteesta, kernelistä, muistista ja monesta muusta järjestelmätiedosta.</p>
             <p>Haetaan tietoa esim. prosessorista, käyttöjärjestelmästä ja kernelistä.</p>
-<pre class="code"><code>$ sudo salt '*' grains.items|grep -A 3 cpu_model;sudo salt '*' grains.items|grep -A 3 'os:';sudo salt '*' grains.items|grep -A 1 kernel
+<pre><code>$ sudo salt '*' grains.items|grep -A 3 cpu_model;sudo salt '*' grains.items|grep -A 3 'os:';sudo salt '*' grains.items|grep -A 1 kernel
     cpu_model:
         Intel(R) Core(TM) i5-2500K CPU @ 3.30GHz
     cpuarch:
@@ -318,21 +318,21 @@ Hello again, Salt! t: master
             <h3 id="h1e">Muu tila</h3>
             <p class="assignment">Kokeile jotain toista tilaa kuin file.managed. Tärkeitä ovat pkg.installed, file.managed, service.running, file.symlink, user.present, group.present. Ohjeita saa esim 'sudo salt kissa sys.state_doc pkg.installed|less'</p>
             <p>Muokataan top -tiedostoa.</p>
-<pre class="code"><code>$ sudoedit /srv/salt/top.sls</code></pre>
-<pre class="code"><code>base:
+<pre><code>$ sudoedit /srv/salt/top.sls</code></pre>
+<pre><code>base:
   '*':
     - hello
   'wings':
     - installs</code></pre>
             <p>Luodaan uusi tiedosto pakettien asennuksille.</p>
-<pre class="code"><code>$ sudoedit /srv/salt/installs.sls</code></pre>
-<pre class="code"><code>htop:
+<pre><code>$ sudoedit /srv/salt/installs.sls</code></pre>
+<pre><code>htop:
   pkg.installed
 
 vlc:
   pkg.installed</code></pre>
             <p>Ajetaan tila ulos.</p>
-<pre class="code"><code>$ sudo salt '*' state.highstate
+<pre><code>$ sudo salt '*' state.highstate
 wings:
 ----------
           ID: /tmp/hellosalt.txt

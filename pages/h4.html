@@ -70,7 +70,7 @@
             <p>Edellisten harjoitusten jälkeen virtuaalikoneeni ovat lakanneet toimimasta. Päivän puntaroinnin jälkeen päättelin, että Windows Sandboxin asennus on sotkenut virtualisoinnin. Ennen kuin hoksasin tämän, poistin virtuaalikoneet ja loin ne uudelleen. Ongelma ratkesi kun laitoin Windows Sandboxin pois käytöstä. Virtuaalikoneet on siis suotta tehty uudelleen, joten valmistelen SaltStackin ensimmäisen viikon tapojen mukaisesti. <a href="h1.html">H1 - Hello Salt!</a></p>
             <p>Tässä lyhyesti komentorivisyöte. Selitykset yksityiskohtaisesti komennoille voi lukea ensimmäisen viikon sivuilta tehtävästä <a href="h1.html#h1b">Asenna Salt</a></p>
             <p>Alla siis asennetaan salt-master ja salt-minion samalle koneelle, sekä tehdään minion-asetukset ja hyväksytään avain masterilla. Lopussa testaus.</p>
-<pre class="code"><code>$ sudo apt-get update
+<pre><code>$ sudo apt-get update
 $ sudo apt-get install salt-master salt-minion -y
 $ hostname -I
 192.168.1.127 
@@ -97,20 +97,20 @@ wings:
         <div class="blueBox">
             <h3 id="h4c">Pinta (Asennus ja konfiguraatio)</h3>
             <p>Asennetaan avoimen lähdekoodin kuvankäsittelyohjelma Pinta.</p>
-<pre class="code"><code>$ sudo apt-get install pinta -y</code></pre>
+<pre><code>$ sudo apt-get install pinta -y</code></pre>
             <p>Käydään muokkaamassa Pintan graafisesta käyttöliittymästä asetuksia. Ei heti alkuun löydy mitään huomattavaa asetusta, mutta viivain olisi varmaan hyvä näkyä. Laitetaan päälle.
             </p>
             <a href="../img/h4/h4img1.jpg" target="_blank"><img src="../img/h4/h4img1.jpg" alt="h4img1"></a><br>
             <p>Katsotaan mitä tiedostoja Pinta muokkaa asetuksia varten. Tarkastellaan siis tiedostot /etc/ ja $HOME kansioista ja ja järjestetään viimeksi muokatun mukaan.</p>
-<pre class="code"><code>$ find /etc/ $HOME -printf '%T+ %p\n'|sort</code></pre>
+<pre><code>$ find /etc/ $HOME -printf '%T+ %p\n'|sort</code></pre>
             <p>Tulosteest eivät näytä mitään olennaista tulosta. Kokeillaan sulkea Pinta, josko muutokset tapahtuvat vasta kun sovellus suljetaan.</p>
-<pre class="code"><code>2020-04-29+19:27:32.9516647800 /home/krisu/.config/Pinta/layouts.xml
+<pre><code>2020-04-29+19:27:32.9516647800 /home/krisu/.config/Pinta/layouts.xml
 2020-04-29+19:27:32.9556667800 /home/krisu/.config/Pinta
 2020-04-29+19:27:32.9556667800 /home/krisu/.config/Pinta/palette.txt
 2020-04-29+19:27:32.9556667800 /home/krisu/.config/Pinta/settings.xml
 </code></pre>
             <p>Nyt muutoksia näkyy käyttäjän kotihakemiston .config kansiossa. settings.xml näyttää olennaiselta. Tarkastellaan sisältöä.</p>
-<pre class="code"><code>$ less ~/.config/Pinta/settings.xml  
+<pre><code>$ less ~/.config/Pinta/settings.xml  
 &lt;U+FEFF&gt;&lt;settings&gt;
   &lt;setting name="ruler-metric" type="System.Int32"&gt;0&lt;/setting&gt;
   &lt;setting name="window-maximized" type="System.Boolean"&gt;True&lt;/setting&gt;
@@ -122,12 +122,12 @@ wings:
 </code></pre>
             <p>Asetustiedostossa näkyy arvot viivaimen yksiköille, ikkunan maksimoimiselle ja viivaimen, työkalupalkin, pikseliruudukon näkyvyydelle, sekä viimeksi muokattujen tiedostojen sijainnit. Ei muutettu muuta kuin viivain päälle, joten voidaan hyvin kopioida koko tiedosto Saltin käytettäväksi.</p>
             <p>Luodaan kansio Saltin Pinta-tiloille.</p>
-<pre class="code"><code>$ sudo mkdir -p /srv/salt/
+<pre><code>$ sudo mkdir -p /srv/salt/
 $ cd /srv/salt
 $ sudo mkdir pinta
 $ sudo mkdir pinta/templates</code></pre>
             <p>Asetetaan top.sls tiedosto, sekä init.sls tiedosto Pintan asennukseen ja konfiguraatioon.</p>
-<pre class="code"><code>$ sudoedit top.sls
+<pre><code>$ sudoedit top.sls
 $ cat top.sls 
 base:
   '*':
@@ -152,10 +152,10 @@ pinta:
     - makedirs: True
 </code></pre>
             <p>Nyt init.sls kansiossa viitataan /srv/salt/pinta/templates/ kansiossa sijaitsevaan settings.xml:n, joka siirretään sekä käyttäjän krisu asetustiedostoihin, että uusien käyttäjien luonnissa käytettyyn /etc/skel/ mallihakemistoon. Kopioidaan settings.xml tänne.</p>
-<pre class="code"><code>$ sudo cp ~/.config/Pinta/settings.xml /srv/salt/pinta/templates/
+<pre><code>$ sudo cp ~/.config/Pinta/settings.xml /srv/salt/pinta/templates/
 </code></pre>
             <p>Koitetaan ajaa tila orjalle.</p>
-<pre class="code"><code>$ sudo salt '*' state.apply pinta</code></pre>
+<pre><code>$ sudo salt '*' state.apply pinta</code></pre>
             <a href="../img/h4/h4img2.jpg" target="_blank"><img src="../img/h4/h4img2.jpg" alt="h4img2"></a><br>
             <p>Kaikki meni läpi onnistuneesti.</p>
         </div>
@@ -164,9 +164,9 @@ pinta:
             <h3 id="h4d">C# compiler</h3>
             <p>Rinnakkaisen C#-kurssin vuoksi haluan kokeilla kääntää C#-koodia toimintakuntoon Linux-koneella.</p>
             <p>Lyhyen etsimisen jälkeen törmäsin <a href="https://www.mono-project.com/">Mono-projektiin</a>. Asennetaan mono-complete paketti.</p>
-<pre class="code"><code>$ sudo apt-get install mono-complete -y</code></pre>
+<pre><code>$ sudo apt-get install mono-complete -y</code></pre>
             <p>Käyttö ei vaikuta kovin monimutkaiselta, joten luodaan C#-koodia.</p>
-<pre class="code"><code>$ cd
+<pre><code>$ cd
 $ mkdir Code
 $ cd Code
 $ nano hello.cs
@@ -180,11 +180,11 @@ class HelloWorld {
 }
 </code></pre>
             <p>Käytetään monoa kääntämiseen ja käännetyn ohjelman suorittamiseen.</p>
-<pre class="code"><code>$ mcs -out:hello.exe hello.cs
+<pre><code>$ mcs -out:hello.exe hello.cs
 $ mono hello.exe
 Hello mono!</code></pre>
             <p>Kokeillaan saadaanko samaa tehtyä SaltStackilla. Ensin luodaan tilat monon asennukseen ja hello.cs -tiedoston kirjoittamiseen.</p>
-<pre class="code"><code>$ cd /srv/salt/
+<pre><code>$ cd /srv/salt/
 $ sudo mkdir mono
 $ sudo mkdir mono/templates
 $ sudoedit mono/init.sls
@@ -200,9 +200,9 @@ mono-complete:
     - mode: 664
     - makedirs: True</code></pre>
             <p>Kopioidaan hello.cs Saltin templates kansioon.</p>
-<pre class="code"><code>$ sudo cp ~/Code/hello.cs /srv/salt/mono/templates/</code></pre>
+<pre><code>$ sudo cp ~/Code/hello.cs /srv/salt/mono/templates/</code></pre>
             <p>Testataan tässä välissä tiloja.</p>
-<pre class="code"><code>$ sudo salt '*' state.apply mono
+<pre><code>$ sudo salt '*' state.apply mono
 wings:
 ----------
           ID: mono-complete
@@ -230,7 +230,7 @@ Total states run:     2
 Total run time:   1.964 s
 </code></pre>
             <p>Luodaan uusi tila, joka ajaa mcs-komennon komentorivillä. Tällä ajetaan mcs komento, jos hello.exe tiedostoa ei vielä ole ja hello.cs on olemassa.</p>
-            <pre class="code"><code>$ sudoedit /srv/salt/mono/init.sls
+            <pre><code>$ sudoedit /srv/salt/mono/init.sls
 $ cat /srv/salt/mono/init.sls
 ...
 compilehello:
@@ -241,7 +241,7 @@ compilehello:
       - file: /home/krisu/Code/hello.cs
 </code></pre>
             <p>Ajetaan tilat orjalle.</p>
-<pre class="code"><code>$ sudo salt '*' state.apply mono
+<pre><code>$ sudo salt '*' state.apply mono
 wings:
 ...  
 ----------
@@ -263,12 +263,12 @@ Total states run:     3
 Total run time:   1.993 s
 </code></pre>
             <p>Poistetaan vielä hello.exe tiedosto ja ajetaan sitten uudelleen, jotta nähdään suorittaako Salt komennon oikein.</p>
-<pre class="code"><code>$ rm ~/Code/hello.exe
+<pre><code>$ rm ~/Code/hello.exe
 $ sudo salt '*' state.apply mono</code></pre>
             <a href="../img/h4/h4img3.jpg" target="_blank"><img src="../img/h4/h4img3.jpg" alt="h4img3"></a><br>
             <p>Kuvankaappauksesta näkyy, että lopussa vielä testasin, että hello.exe toimii kuten pitää. Ja se toimii.</p>
             <p>Testaan vielä toimiiko komento Saltin kautta.</p>
-<pre class="code"><code>$ sudo salt 'wings' cmd.run 'mono /home/krisu/Code/hello.exe'
+<pre><code>$ sudo salt 'wings' cmd.run 'mono /home/krisu/Code/hello.exe'
 wings:
     Hello mono!
 </code></pre>
@@ -280,7 +280,7 @@ wings:
             <p>Jatkan Monolla. Tällä kertaa tahdon asentaa MonoDevelop kehitysympäristön (IDE). <a href="https://www.monodevelop.com/download/#fndtn-download-lin-ubuntu">Asennus-sivulta</a> selviää että, MonoDevelopia ei kuitenkaan löydy valmiiksi apt pakettimanagerista. Täytyy luoda tila, jolla manageriin saadaan paketin sijainti ja avain.</p>
             <p>SaltStackin dokumentoinnista löytyy komentt <a href="https://docs.saltstack.com/en/latest/ref/states/all/salt.states.pkgrepo.html">salt.states.pkgrepo</a>, jolla tämän luulisi hoituvan.</p>
             <p>Luodaan aluksi vaaditut kansiot ja tiedostot saltin kansioihin.</p>
-            <pre class="code"><code>$ cd /srv/salt 
+            <pre><code>$ cd /srv/salt 
 $ sudo mkdir monodevelop
 $ sudoedit monodevelop/init.sls
 $ cat monodevelop/init.sls
@@ -303,7 +303,7 @@ monodevelop-repository:
                 <li><span class="command">keyserver</span> palvelin josta GPG-avain haetaan.</li>
             </ul>
             <p>Kokeillaan ajaa tila.</p>
-<pre class="code"><code>$ sudo salt '*' state.apply monodevelop
+<pre><code>$ sudo salt '*' state.apply monodevelop
 wings:
 ----------
           ID: monodevelop-repository
@@ -327,13 +327,13 @@ Total states run:     1
 Total run time:  35.714 s
 </code></pre>
             <p>Odotin virheilmoitusta, mutta näyttää menneen läpi ensimmäisellä yrityksellä. Tarkastetaan löytyykö monodevelop nyt aptista.</p>
-            <pre class="code"><code>$ sudo apt-cache search 'monodevelop'
+            <pre><code>$ sudo apt-cache search 'monodevelop'
 ...
 monodevelop - Development Environment for GNOME
 monodevelop-nunit - NUnit plugin for MonoDevelop
 monodevelop-versioncontrol - VersionControl plugin for MonoDevelop</code></pre>
             <p>Näyttää löytyvän. Lisätään paketinasennustila.</p>
-<pre class="code"><code>$ sudoedit monodevelop/init.sls
+<pre><code>$ sudoedit monodevelop/init.sls
 ...
 monodevelop:
   pkg.installed:
@@ -346,7 +346,7 @@ monodevelop:
                 <b>Virhe</b>
                 <p>Kokeillaan vielä, että MonoDevelop toimii. Eipä toimi. Kokeilin vielä manuaalisesti asentaa, mutta aptin mukaan ohjelma on asennettu, mutta MonoDevelop ei suostu käynnistymään.</p>
                 <p>Hetken vietän hakukoneen parissa ja löydän StackOverflow <a href="https://stackoverflow.com/questions/25791149/monodevelop-will-not-start-in-mint-17">langan</a>, jossa jollakin on sama ongelma ja oli puuttuvia riippuvuuksia. mono-complete oli jo asennettu aiemmassa kohdassa, joten lähdin asentamaan gtk-sharp3 pakettia. Tämä on Graphical User Interface Toolkit Monoon ja .NETiin.</p>
-                <pre class="code"><code>$ sudo apt-get install gtk-sharp3 -y</code></pre>
+                <pre><code>$ sudo apt-get install gtk-sharp3 -y</code></pre>
                 <p>Tässä meneekin yllättäen huomattavan paljon aikaa. Jo parikymmentä minuuttia istuttu ja odoteltu. Ohjelma asentelee sertifikaatteja ja esikääntää jotain Monon tiedostoja.</p>
                 <a href="../img/h4/h4img5.jpg" target="_blank"><img src="../img/h4/h4img5.jpg" alt="h4img5"></a><br>
                 <p>Tällä välin haen muuta mahdollista selitystä sille miksei ohjelma suostunut käynnistymään. Löydän blogin, jossa ohjeistetaan asentamaan mono-devel, mutta ei sanaakaan gtk-sharp3:sta. Jatketaan odottelua...</p>
@@ -365,7 +365,7 @@ monodevelop:
             
             
             Ajan tähän mennessä luodut tilat uudelle minionille. Jätän gtk-sharp3 paketin asentamatta, sillä sen asennukseen menee todella paljon aikaa.</p>
-            <pre class="code"><code>$ sudoedit top.sls 
+            <pre><code>$ sudoedit top.sls 
 $ cat top.sls 
 base:
   '*':
@@ -374,17 +374,17 @@ base:
     - monodevelop
 </code></pre>
             <p>Ajetaan uudelle minionille.</p>
-<pre class="code"><code>$ sudo salt 'feather1' state.apply</code></pre>
+<pre><code>$ sudo salt 'feather1' state.apply</code></pre>
             <p>Kaikki kahdeksan luotua tilaa meni läpi minionille.</p>
             <a href="../img/h4/h4img7.jpg" target="_blank"><img src="../img/h4/h4img7.jpg" alt="h4img7"></a><br>
             <p>~/Code/ kansiosta löytyy hello.cs ja hello.exe tiedostot.</p>
-            <pre class="code"><code>~/Code$ mono hello.exe 
+            <pre><code>~/Code$ mono hello.exe 
 Hello mono!
 </code></pre>
             <div class="taskerror">
                 <b>Virheitä</b>
                 <p>MonoDevelop ei tietenkään käynnisty, mutta tällä kertaa myös Pinta ei suostu käynnistymään. Pintasta tulee komentorivillä käynnistettäessä virheilmoitus puuttuvista Mono-paketeista. Tulkitsen asian niin, että SaltStack ei osaa asentaa riippuvuuksia oikein tietyille graafista käyttöliittymää hyödyntäville ohjelmille. Kokeilen asentaa Pintan ylintä riippuvuutta</p>
-<pre class="code"><code>$ sudo apt-cache depends pinta
+<pre><code>$ sudo apt-cache depends pinta
 pinta
   Depends: mono-runtime
  |Depends: libc6
@@ -398,9 +398,9 @@ Mono precompiling /usr/lib/mono/4.5/mscorlib.dll for amd64 (trying with LLVM, th
                 <a href="../img/h4/h4img8.jpg" target="_blank"><img src="../img/h4/h4img8.jpg" alt="h4img8"></a><br>
                 <p>Näyttää siltä, että kyseessä on taas jokin ikuisuusprojekti kuten aiemmin monon tiedostojen kääntämisessä. Manuaalisesti Pintan asennukseen ei mennyt näin kauan, joten jokin on mennyt SaltStackin kautta asentaessa pahasti pieleen.</p>
                 <p>15 minuutin päästä mono-runtime on asentunut. Nyt Pinta käynnistyy. Poistan turhat riippuvudeet.</p>
-                <pre class="code"><code>sudo apt-get autoremove</code></pre>
+                <pre><code>sudo apt-get autoremove</code></pre>
                 <p>Tuloste valittaa mono-complete ja mono-devel paketeista. Ajan ehdotetun komennon rikkinäisten asennusten korjaamiseksi.</p>
-                <pre class="code"><code>sudo apt --fix-broken install</code></pre>
+                <pre><code>sudo apt --fix-broken install</code></pre>
                 <a href="../img/h4/h4img9.jpg" target="_blank"><img src="../img/h4/h4img9.jpg" alt="h4img9"></a><br>
                 <p>Tulosteessa näkyy jälleen sertifikaattien lisäilyä ja Monon kääntämistä kymmeniä minuutteja.</p>
                 <a href="../img/h4/h4img10.jpg" target="_blank"><img src="../img/h4/h4img10.jpg" alt="h4img10"></a><br>
